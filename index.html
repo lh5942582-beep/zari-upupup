@@ -3,15 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人工作台 | Personal Dashboard</title>
-   <!-- 开启全屏模式，隐藏浏览器地址栏 -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#f8fafc">
-    <!-- 专属 App 图标 -->
-<link rel="apple-touch-icon" sizes="180x180" href="./icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="./icon.png">
+    <title>个人工作台 | Personal Dashboard 2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         ::-webkit-scrollbar { width: 6px; }
@@ -229,4 +221,75 @@
         const totalExpenseEl = document.getElementById('total-expense');
         const netBalanceEl = document.getElementById('net-balance');
         const financeCol = collection(db, 'finance');
-        let currentFinance
+        let currentFinance = [];
+
+        onSnapshot(financeCol, (snapshot) => {
+            currentFinance = [];
+            snapshot.forEach((doc) => currentFinance.push({ id: doc.id, ...doc.data() }));
+            currentFinance.sort((a, b) => b.createdAt - a.createdAt);
+            renderFinance();
+        });
+
+        function formatMoney(amount) {
+            return '¥' + parseFloat(amount).toFixed(2);
+        }
+
+        function renderFinance() {
+            financeList.innerHTML = '';
+            let income = 0, expense = 0;
+
+            if (currentFinance.length === 0) {
+                financeList.innerHTML = '<li class="text-center text-slate-400 text-sm py-4">暂无账单记录</li>';
+            } else {
+                currentFinance.forEach(t => {
+                    const isIncome = t.type === 'income';
+                    if (isIncome) income += t.amount; else expense += t.amount;
+
+                    const li = document.createElement('li');
+                    li.className = 'group flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 hover:bg-white hover:border-slate-200 transition-all';
+                    li.innerHTML = `
+                        <div class="flex flex-col overflow-hidden">
+                            <span class="text-sm font-medium text-slate-700 truncate">${t.desc}</span>
+                            <span class="text-[10px] text-slate-400">${new Date(t.date).toLocaleDateString()}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-bold ${isIncome ? 'text-emerald-600' : 'text-rose-600'}">
+                                ${isIncome ? '+' : '-'}${formatMoney(t.amount)}
+                            </span>
+                            <button onclick="window.deleteTransaction('${t.id}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                    `;
+                    financeList.appendChild(li);
+                });
+            }
+
+            const balance = income - expense;
+            totalIncomeEl.textContent = formatMoney(income);
+            totalExpenseEl.textContent = formatMoney(expense);
+            netBalanceEl.textContent = formatMoney(balance);
+            netBalanceEl.className = `text-sm font-bold ${balance < 0 ? 'text-red-600' : 'text-blue-700'}`;
+        }
+
+        financeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const amount = parseFloat(financeAmount.value);
+            const desc = financeDesc.value.trim();
+            const type = financeType.value;
+
+            if (!isNaN(amount) && desc) {
+                financeAmount.value = '';
+                financeDesc.value = '';
+                await setDoc(doc(financeCol, Date.now().toString()), { 
+                    desc, amount, type, date: new Date().toISOString(), createdAt: Date.now() 
+                });
+            }
+        });
+
+        window.deleteTransaction = async (id) => {
+            await deleteDoc(doc(db, 'finance', id));
+        };
+    </script>
+</body>
+</html>
