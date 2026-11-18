@@ -3,119 +3,400 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人工作台 | Personal Dashboard 2.0</title>
+    <title>zari的数字人生</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; margin: 0; 
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        canvas: '#F4F1EA',
+                        ink: '#4A443B',
+                        inkLight: '#8A8175',
+                        accent: '#D4A373', 
+                        surface: '#FDFCF9',
+                        borderLight: '#EAE5D9'
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(138, 129, 117, 0.1)',
+                    }
+                }
+            }
         }
-        input[type=number] { -moz-appearance: textfield; }
+    </script>
+    <style>
+        body {
+            background-color: #F4F1EA;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+            color: #4A443B;
+        }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #D4CDBC; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #BDB5A1; }
+        
+        .oil-panel { 
+            background: rgba(253, 252, 249, 0.7); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(234, 229, 217, 0.8); 
+            box-shadow: 0 10px 40px -10px rgba(138, 129, 117, 0.08);
+        }
+        
+        .input-paper {
+            background: #F8F6F0;
+            border: 1px solid #EAE5D9;
+            transition: all 0.3s ease;
+        }
+        .input-paper:focus {
+            background: #FFFFFF;
+            border-color: #D4A373;
+            box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.15);
+        }
+
+        .vision-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .vision-content.open {
+            max-height: 800px;
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen p-4 md:p-8">
+<body class="font-sans min-h-screen p-4 md:p-8 selection:bg-accent selection:text-white relative">
 
-    <div class="max-w-7xl mx-auto">
-        <!-- 头部 -->
-        <header class="mb-8 flex items-center justify-between">
-            <div>
-                <h1 class="text-3xl font-bold text-slate-900 tracking-tight">个人工作台</h1>
-                <p class="text-slate-500 mt-1">欢迎回来，今天想完成些什么？</p>
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-[#E29578] rounded-full mix-blend-multiply filter blur-[100px] opacity-10 pointer-events-none"></div>
+    <div class="absolute top-20 right-1/4 w-96 h-96 bg-[#839788] rounded-full mix-blend-multiply filter blur-[100px] opacity-10 pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto space-y-6 relative z-10">
+        
+        <!-- 一、 全局穹顶：人生北极星 (🪞观自己) -->
+        <header class="oil-panel rounded-2xl p-6 relative overflow-hidden group cursor-pointer" onclick="toggleVision(event)">
+            <div class="relative z-10 flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-semibold text-accent uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                        zari的数字人生
+                    </p>
+                    <h1 class="text-2xl font-bold text-ink mb-1">跑通前端工作台框架，精进 3D 渲染流程</h1>
+                    <p class="text-sm text-inkLight font-serif italic">“创造极致的视觉体验，掌控自己的人生节奏。”</p>
+                </div>
+                <div class="bg-canvas p-2 rounded-full border border-borderLight text-inkLight group-hover:text-accent group-hover:bg-white transition-all">
+                    <svg id="vision-icon" class="w-5 h-5 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
             </div>
-            <div class="text-sm font-medium text-slate-400 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100" id="current-date">
+            
+            <div id="vision-details" class="vision-content relative z-10 cursor-default" onclick="event.stopPropagation()">
+                <div class="pt-6 mt-6 border-t border-borderLight grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-sm font-bold text-ink mb-2 flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#839788]"></span> 十年图景
+                            </h3>
+                            <p class="text-[11.5px] text-inkLight leading-relaxed">建立属于自己的跨界设计工作室，实现财务自由，能够在世界任何一个冲浪胜地旅居并远程工作，拥有完全自主的时间与创作权。</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-ink mb-2 flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#E29578]"></span> 想成为的人
+                            </h3>
+                            <p class="text-[11.5px] text-inkLight leading-relaxed">一个精力充沛、内核稳定、对世界保持强烈好奇心的创作者。既能用理性的逻辑构建系统，也能用感性的右脑挥洒灵感。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="md:border-l border-borderLight md:pl-8 flex flex-col h-56">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-sm font-bold text-ink flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-ink"></span> 自我迭代 (观自己)
+                            </h3>
+                            <span class="text-[9px] text-inkLight bg-canvas px-1.5 py-0.5 rounded border border-borderLight">灵魂树洞</span>
+                        </div>
+                        <ul id="self-list" class="flex-1 overflow-y-auto space-y-2 pr-2"></ul>
+                    </div>
+                </div>
             </div>
         </header>
 
-        <!-- 网格布局 -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto lg:h-[600px]">
+        <!-- 二、 中枢入口：AI 闪念胶囊 -->
+        <section class="oil-panel rounded-2xl p-6">
+            <h2 class="text-sm font-bold text-ink mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                闪念胶囊 (The Inbox)
+            </h2>
+            <form id="inbox-form" class="relative mb-6">
+                <input type="text" id="inbox-input" placeholder="记录突发奇想、待办雏形或深度思考，按回车保存..." 
+                       class="w-full input-paper rounded-xl px-5 py-4 text-sm text-ink focus:outline-none placeholder-inkLight/60" autocomplete="off" required>
+                <button type="submit" class="absolute right-3 top-3 text-xs bg-canvas text-inkLight border border-borderLight hover:bg-accent hover:text-white hover:border-accent px-3 py-1.5 rounded-lg transition-colors font-medium">
+                    捕获 (↵)
+                </button>
+            </form>
+            <div>
+                <p class="text-[11px] font-bold text-inkLight/70 uppercase tracking-widest mb-3">待分拣中心 (5大维度)</p>
+                <ul id="inbox-list" class="space-y-2"></ul>
+            </div>
+        </section>
+
+        <!-- 三、 四大平行基本盘 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             
-            <!-- 模块 1: 待办事项 -->
-            <section class="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden h-[500px] lg:h-full">
-                <div class="p-5 border-b border-slate-100 bg-slate-50/50">
-                    <h2 class="text-lg font-semibold flex items-center gap-2">
-                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                        待办事项
-                    </h2>
+            <!-- 1. 财富与资产大盘 -->
+            <div class="oil-panel rounded-2xl p-5 flex flex-col h-[520px]">
+                <h2 class="text-sm font-bold text-ink mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-[#839788]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    财富与资产
+                </h2>
+                
+                <div class="bg-[#F8F6F0] p-4 rounded-xl border border-borderLight mb-4 relative overflow-hidden flex-shrink-0">
+                    <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-[#839788] opacity-5 rounded-full blur-xl"></div>
+                    <div class="flex justify-between items-end mb-3">
+                        <div>
+                            <p class="text-[10px] text-inkLight font-bold mb-1 uppercase tracking-wider">总净资产</p>
+                            <p class="text-xl font-bold text-ink" id="wealth-total">¥0.00</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-inkLight font-bold mb-1 uppercase tracking-wider">当月总开销</p>
+                            <p class="text-lg font-bold text-[#E29578]" id="wealth-monthly-expense">¥0.00</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 border-t border-borderLight/60 pt-3">
+                        <div>
+                            <p class="text-[9px] text-inkLight mb-0.5">日常现金流</p>
+                            <p class="text-xs font-bold text-ink" id="wealth-cash">¥0.00</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] text-inkLight mb-0.5">稳健理财</p>
+                            <p class="text-xs font-bold text-[#839788]" id="wealth-steady">¥0.00</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] text-inkLight mb-0.5">长期投资</p>
+                            <p class="text-xs font-bold text-accent" id="wealth-long">¥0.00</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="p-5 flex-1 flex flex-col min-h-0">
-                    <form id="todo-form" class="flex gap-2 mb-4">
-                        <input type="text" id="todo-input" placeholder="添加新任务..." class="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm" required>
-                        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors font-medium text-sm flex items-center justify-center">添加</button>
-                    </form>
-                    <ul id="todo-list" class="flex-1 overflow-y-auto space-y-2 pr-2"></ul>
-                </div>
-            </section>
 
-            <!-- 模块 2: 快速笔记 -->
-            <section class="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden h-[500px] lg:h-full">
-                <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                    <h2 class="text-lg font-semibold flex items-center gap-2">
-                        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        快速笔记
-                    </h2>
-                    <span id="save-status" class="text-xs text-slate-400 transition-opacity duration-300 opacity-0">已保存</span>
-                </div>
-                <div class="p-5 flex-1 flex flex-col min-h-0">
-                    <textarea id="notes-area" class="flex-1 w-full bg-slate-50 border border-slate-200 rounded-xl p-4 resize-none focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all text-sm leading-relaxed" placeholder="在这里输入你的想法，内容会自动云端同步..."></textarea>
-                </div>
-            </section>
+                <form id="wealth-form" class="space-y-2.5 mb-4 flex-shrink-0">
+                    <div class="flex gap-2">
+                        <select id="wealth-type" class="w-[30%] input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none">
+                            <option value="income">存入 (+)</option>
+                            <option value="expense">支出 (-)</option>
+                        </select>
+                        <select id="wealth-account" class="w-[35%] input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none">
+                            <option value="cash">现金流</option>
+                            <option value="steady">稳健理财</option>
+                            <option value="long">长期投资</option>
+                        </select>
+                        <input type="number" id="wealth-amount" placeholder="金额" step="0.01" min="0.01" class="w-[35%] input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none" required>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="wealth-desc" placeholder="描述" class="flex-1 input-paper rounded-lg px-3 py-1.5 text-[11px] text-ink focus:outline-none" required>
+                        <button type="submit" class="bg-ink text-canvas hover:bg-inkLight px-3 py-1.5 rounded-lg transition-colors font-bold text-[11px] whitespace-nowrap">记录</button>
+                    </div>
+                </form>
 
-            <!-- 模块 3: 财务理财 -->
-            <section class="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden h-[600px] lg:h-full">
-                <div class="p-5 border-b border-slate-100 bg-slate-50/50">
-                    <h2 class="text-lg font-semibold flex items-center gap-2">
-                        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        理财记账
+                <div class="flex-1 flex flex-col min-h-0">
+                    <p class="text-[10px] font-bold text-inkLight/70 uppercase tracking-widest mb-2 mt-1">流水明细</p>
+                    <ul id="wealth-list" class="flex-1 overflow-y-auto space-y-2 pr-1 pb-2"></ul>
+                </div>
+            </div>
+
+            <!-- 2. 身体与能量管理 -->
+            <div class="oil-panel rounded-2xl p-5 flex flex-col h-[520px]">
+                <h2 class="text-sm font-bold text-ink mb-4 flex items-center gap-2 flex-shrink-0">
+                    <svg class="w-4 h-4 text-[#E29578]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    身体与能量
+                </h2>
+
+                <div class="bg-[#F8F6F0] p-4 rounded-xl border border-borderLight mb-4 relative overflow-hidden flex-shrink-0">
+                    <div class="absolute -left-4 -bottom-4 w-20 h-20 bg-[#E29578] opacity-5 rounded-full blur-xl"></div>
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <p class="text-[10px] text-inkLight font-bold mb-1 uppercase tracking-wider">最新身体反馈</p>
+                            <p class="text-base font-bold text-ink" id="health-current-state">待同步</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-inkLight font-bold mb-1 uppercase tracking-wider">本周训练频次</p>
+                            <p class="text-xl font-bold text-[#E29578]"><span id="health-weekly-count">0</span><span class="text-xs text-inkLight ml-1 font-normal">次</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="health-form" class="space-y-2.5 mb-4 flex-shrink-0">
+                    <div class="flex gap-2">
+                        <select id="health-activity" class="w-[45%] input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none">
+                            <option value="功能性训练">功能性训练</option>
+                            <option value="居家运动">居家运动</option>
+                            <option value="散步">散步</option>
+                            <option value="拉单杠">拉单杠</option>
+                            <option value="健身房">健身房</option>
+                            <option value="纯休息">纯休息</option>
+                        </select>
+                        <input type="text" id="health-duration" placeholder="时长或组数" class="w-[55%] input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none" required>
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="health-state" class="flex-1 input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none">
+                            <option value="精力充沛">💪 精力充沛</option>
+                            <option value="状态平稳">👌 状态平稳</option>
+                            <option value="急需回血">🔋 急需回血</option>
+                            <option value="肌肉酸痛">🩹 肌肉酸痛</option>
+                        </select>
+                        <button type="submit" class="bg-ink text-canvas hover:bg-inkLight px-3 py-1.5 rounded-lg transition-colors font-bold text-[11px] whitespace-nowrap">打卡</button>
+                    </div>
+                </form>
+
+                <div class="flex-1 flex flex-col min-h-0">
+                    <p class="text-[10px] font-bold text-inkLight/70 uppercase tracking-widest mb-2 mt-1">能量轨迹</p>
+                    <ul id="health-list" class="flex-1 overflow-y-auto space-y-2 pr-1 pb-2"></ul>
+                </div>
+            </div>
+
+            <!-- 3. 生活与内观 (🌍 观世界) -->
+            <div class="oil-panel rounded-2xl p-5 flex flex-col h-[520px]">
+                <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                    <h2 class="text-sm font-bold text-ink flex items-center gap-2">
+                        <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        生活与内观
                     </h2>
+                    <!-- 双 Tab 切换 -->
+                    <div class="flex bg-borderLight/50 p-1 rounded-lg">
+                        <button id="tab-exp" class="px-2 py-1 text-[10px] font-bold rounded-md bg-white shadow-sm text-ink transition-all">🎞️ 拾光</button>
+                        <button id="tab-world" class="px-2 py-1 text-[10px] font-bold rounded-md text-inkLight hover:text-ink transition-all">🌍 观世界</button>
+                    </div>
                 </div>
                 
-                <div class="p-5 flex-1 flex flex-col min-h-0">
-                    <div class="grid grid-cols-3 gap-3 mb-5">
-                        <div class="bg-emerald-50 rounded-xl p-3 text-center border border-emerald-100">
-                            <p class="text-xs text-emerald-600 font-medium mb-1">总收入</p>
-                            <p class="text-sm font-bold text-emerald-700" id="total-income">¥0.00</p>
+                <!-- 3A: 拾光胶卷 (外部体验) -->
+                <div id="content-exp" class="flex-1 flex flex-col min-h-0">
+                    <form id="exp-form" class="space-y-2.5 mb-4 flex-shrink-0">
+                        <textarea id="exp-text" placeholder="记录一次心流、一句感动、或一段治愈的风景..." class="w-full input-paper rounded-xl px-3 py-2.5 text-[11px] text-ink focus:outline-none resize-none h-14 placeholder-inkLight/60 leading-relaxed" required></textarea>
+                        <div class="flex items-center gap-2">
+                            <label class="cursor-pointer flex-1 flex items-center justify-center gap-1.5 input-paper rounded-lg px-2 py-1.5 text-[11px] text-inkLight hover:text-ink hover:border-[#D4CDBC] transition-colors border-dashed">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <span id="exp-img-label">添加图片 (可选)</span>
+                                <input type="file" id="exp-image" accept="image/*" class="hidden">
+                            </label>
                         </div>
-                        <div class="bg-rose-50 rounded-xl p-3 text-center border border-rose-100">
-                            <p class="text-xs text-rose-600 font-medium mb-1">总支出</p>
-                            <p class="text-sm font-bold text-rose-700" id="total-expense">¥0.00</p>
+                        <div class="flex gap-2">
+                            <select id="exp-tag" class="flex-1 input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none">
+                                <option value="日常微光">✨ 日常微光</option>
+                                <option value="链接周边">👯‍♀️ 链接周边</option>
+                                <option value="心流时刻">🌊 心流时刻</option>
+                                <option value="探索地球">🌍 探索地球</option>
+                            </select>
+                            <button type="submit" class="bg-ink text-canvas hover:bg-inkLight px-3 py-1.5 rounded-lg transition-colors font-bold text-[11px] whitespace-nowrap">定格</button>
                         </div>
-                        <div class="bg-blue-50 rounded-xl p-3 text-center border border-blue-100">
-                            <p class="text-xs text-blue-600 font-medium mb-1">净资产</p>
-                            <p class="text-sm font-bold text-blue-700" id="net-balance">¥0.00</p>
+                    </form>
+                    <div class="flex-1 flex flex-col min-h-0">
+                        <p class="text-[10px] font-bold text-inkLight/70 uppercase tracking-widest mb-2 mt-1">拾光胶卷</p>
+                        <ul id="exp-list" class="flex-1 overflow-y-auto space-y-3 pr-1 pb-2"></ul>
+                    </div>
+                </div>
+
+                <!-- 3B: 观世界 (万事万物思考) -->
+                <div id="content-world" class="flex-1 flex flex-col min-h-0 hidden">
+                    <form id="world-form" class="space-y-2.5 mb-4 flex-shrink-0">
+                        <textarea id="world-text" placeholder="记录对外部事物、社会现象、技术趋势的深度洞察..." class="w-full input-paper rounded-xl px-3 py-2.5 text-[11px] text-ink focus:outline-none resize-none h-20 placeholder-inkLight/60 leading-relaxed" required></textarea>
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-[#839788] text-white hover:bg-[#839788]/80 px-4 py-1.5 rounded-lg transition-colors font-bold text-[11px]">沉淀</button>
+                        </div>
+                    </form>
+                    <div class="flex-1 flex flex-col min-h-0">
+                        <p class="text-[10px] font-bold text-inkLight/70 uppercase tracking-widest mb-2 mt-1">沉思录</p>
+                        <ul id="world-list" class="flex-1 overflow-y-auto space-y-3 pr-1 pb-2"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 技能迭代与灵感库 (左脑/右脑 主逻辑) -->
+            <div class="oil-panel rounded-2xl p-5 flex flex-col h-[520px]">
+                <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                    <h2 class="text-sm font-bold text-ink flex items-center gap-2">
+                        <svg class="w-4 h-4 text-inkLight" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        迭代与灵感
+                    </h2>
+                    <div class="flex bg-borderLight/50 p-1 rounded-lg">
+                        <button id="tab-left" class="px-2 py-1 text-[10px] font-bold rounded-md bg-white shadow-sm text-ink transition-all">左脑:执行</button>
+                        <button id="tab-right" class="px-2 py-1 text-[10px] font-bold rounded-md text-inkLight hover:text-ink transition-all">右脑:发散</button>
+                    </div>
+                </div>
+
+                <!-- 4A: 左脑 (包含里程碑和习惯两个二级菜单) -->
+                <div id="content-left" class="flex-1 flex flex-col min-h-0">
+                    <div class="flex gap-4 mb-3 border-b border-borderLight/60 pb-2 flex-shrink-0">
+                        <button id="subtab-milestone" class="text-[11px] font-bold text-ink border-b-2 border-ink pb-1 transition-all">🎯 里程碑</button>
+                        <button id="subtab-habit" class="text-[11px] font-bold text-inkLight hover:text-ink border-b-2 border-transparent pb-1 transition-all">🌱 无尽习惯</button>
+                    </div>
+
+                    <div id="view-milestone" class="flex-1 flex flex-col min-h-0">
+                        <form id="skill-form" class="space-y-2.5 mb-3 flex-shrink-0">
+                            <div class="flex gap-2">
+                                <select id="skill-status" class="w-[35%] input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none">
+                                    <option value="wip">⏳ 专注中</option>
+                                    <option value="backlog">📦 抽屉待办</option>
+                                </select>
+                                <input type="text" id="skill-text" placeholder="输入新的里程碑目标..." class="flex-1 input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none" required>
+                                <button type="submit" class="bg-ink text-canvas hover:bg-inkLight px-2.5 py-1.5 rounded-lg transition-colors font-bold text-[11px] whitespace-nowrap">列入</button>
+                            </div>
+                        </form>
+                        <div class="flex-1 flex flex-col min-h-0">
+                            <ul id="skill-list" class="flex-1 overflow-y-auto space-y-2 pr-1 pb-2"></ul>
                         </div>
                     </div>
 
-                    <form id="finance-form" class="space-y-3 mb-5">
-                        <div class="flex gap-2">
-                            <select id="finance-type" class="w-1/3 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                                <option value="expense">支出</option>
-                                <option value="income">收入</option>
-                            </select>
-                            <input type="number" id="finance-amount" placeholder="金额" step="0.01" min="0.01" class="w-2/3 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" required>
+                    <div id="view-habit" class="flex-1 flex flex-col min-h-0 hidden">
+                        <!-- 习惯待办提示区 (从胶囊派发来的 Wip 任务) -->
+                        <div id="habit-prompts-container" class="hidden flex-shrink-0 mb-3 border-b border-borderLight/50 pb-2.5">
+                            <p class="text-[10px] font-bold text-accent uppercase tracking-widest mb-1.5 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 习惯待办 / 意图</p>
+                            <div id="habit-prompts-list" class="flex flex-col gap-1.5"></div>
                         </div>
+
+                        <!-- 常规习惯打卡表单 -->
+                        <form id="habit-form" class="space-y-2.5 mb-3 flex-shrink-0">
+                            <div class="flex gap-2">
+                                <select id="habit-name" class="w-[35%] input-paper rounded-lg px-1.5 py-1.5 text-[10px] text-ink focus:outline-none font-bold">
+                                    <option value="📚 读书">📚 读书</option>
+                                    <option value="🗣️ 学英语">🗣️ 学英语</option>
+                                    <option value="🧩 新技能">🧩 新技能</option>
+                                    <option value="✍️ 写字">✍️ 写字</option>
+                                </select>
+                                <input type="text" id="habit-content" placeholder="记录进度内容..." class="flex-1 input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none" required>
+                                <button type="submit" class="bg-[#839788] text-white hover:bg-[#839788]/80 px-2.5 py-1.5 rounded-lg transition-colors font-bold text-[11px] whitespace-nowrap">打卡</button>
+                            </div>
+                        </form>
+                        <div class="flex-1 flex flex-col min-h-0">
+                            <p class="text-[10px] font-bold text-inkLight/70 uppercase tracking-widest mb-2 mt-1">打卡足迹</p>
+                            <ul id="habit-list" class="flex-1 overflow-y-auto space-y-2.5 pr-1 pb-2"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4B: 右脑 灵感星空 (带图片情绪板) -->
+                <div id="content-right" class="flex-1 flex flex-col min-h-0 hidden">
+                    <form id="inspire-form" class="space-y-2.5 mb-4 flex-shrink-0">
+                        <textarea id="inspire-text" placeholder="捕捉天马行空的视觉灵感或想法..." class="w-full input-paper rounded-xl px-3 py-2.5 text-[11px] text-ink focus:outline-none resize-none h-12 placeholder-inkLight/60 leading-relaxed" required></textarea>
                         <div class="flex gap-2">
-                            <input type="text" id="finance-desc" placeholder="描述 (如: 晚餐, 工资)" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" required>
-                            <button type="submit" class="bg-slate-800 text-white px-4 py-2 rounded-xl hover:bg-slate-900 transition-colors font-medium text-sm whitespace-nowrap">记录</button>
+                            <label class="cursor-pointer flex-1 flex items-center justify-center gap-1.5 input-paper rounded-lg px-2 py-1.5 text-[11px] text-inkLight hover:text-ink hover:border-[#D4CDBC] transition-colors border-dashed">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <span id="inspire-img-label">附加参考图</span>
+                                <input type="file" id="inspire-image" accept="image/*" class="hidden">
+                            </label>
+                            <button type="submit" class="bg-accent text-white hover:bg-accent/80 px-4 py-1.5 rounded-lg transition-colors font-bold text-[11px] whitespace-nowrap">漂流</button>
                         </div>
                     </form>
-
-                    <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">近期记录</h3>
-                    <ul id="finance-list" class="flex-1 overflow-y-auto space-y-2 pr-2"></ul>
+                    <div class="flex-1 flex flex-col min-h-0">
+                        <p class="text-[10px] font-bold text-inkLight/70 uppercase tracking-widest mb-2">情绪板</p>
+                        <ul id="inspire-list" class="flex-1 overflow-y-auto space-y-3 pr-1 pb-2"></ul>
+                    </div>
                 </div>
-            </section>
+            </div>
+
         </div>
+
     </div>
 
-    <!-- 升级为云端 Firebase 的核心脚本 -->
+    <!-- Firebase 云端逻辑 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-        // 注入你的专属秘钥
         const firebaseConfig = {
             apiKey: "AIzaSyAbEEIj-K8q4g_7_dT8wqKAB4LCVB0i9E8",
             authDomain: "zariworkspace-60e41.firebaseapp.com",
@@ -128,168 +409,603 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 设置日期
-        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-        document.getElementById('current-date').textContent = new Date().toLocaleDateString('zh-CN', dateOptions);
+        // 图片压缩
+        function compressImage(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800; const MAX_HEIGHT = 800;
+                    let width = img.width; let height = img.height;
+                    if (width > height && width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } 
+                    else if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    callback(canvas.toDataURL('image/jpeg', 0.7));
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
 
-        // ================= 1. 待办事项 =================
-        const todoForm = document.getElementById('todo-form');
-        const todoInput = document.getElementById('todo-input');
-        const todoList = document.getElementById('todo-list');
-        const todosCol = collection(db, 'todos');
-        let currentTodos = [];
+        // --- 全局 ---
+        window.toggleVision = (e) => {
+            if (e.target.closest('#vision-details') && !e.target.closest('#vision-icon')) return;
+            const details = document.getElementById('vision-details');
+            const icon = document.getElementById('vision-icon');
+            details.classList.toggle('open');
+            icon.style.transform = details.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+        };
 
-        onSnapshot(todosCol, (snapshot) => {
-            currentTodos = [];
-            snapshot.forEach((doc) => currentTodos.push({ id: doc.id, ...doc.data() }));
-            currentTodos.sort((a, b) => b.createdAt - a.createdAt); // 最新添加的在上面
-            renderTodos();
+        // --- 穹顶内观 ---
+        const selfCol = collection(db, 'self_reflections');
+        let currentSelf = [];
+        onSnapshot(selfCol, (snapshot) => {
+            currentSelf = [];
+            snapshot.forEach(doc => currentSelf.push({id: doc.id, ...doc.data()}));
+            currentSelf.sort((a, b) => b.createdAt - a.createdAt);
+            renderSelf();
+        });
+        function renderSelf() {
+            const list = document.getElementById('self-list');
+            list.innerHTML = '';
+            if (currentSelf.length === 0) {
+                list.innerHTML = '<li class="text-xs text-inkLight/60 italic font-serif mt-2">暂无内观记录。当你向内探索，文字会在此生根...</li>'; return;
+            }
+            currentSelf.forEach(s => {
+                const d = new Date(s.createdAt);
+                const li = document.createElement('li');
+                li.className = 'group relative p-3 rounded-xl bg-[#FAF9F5] border border-borderLight hover:border-[#D4CDBC] transition-colors';
+                li.innerHTML = `
+                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words">${s.text}</p>
+                    <div class="flex justify-between items-center mt-2 pt-2 border-t border-borderLight/50">
+                        <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日</span>
+                        <button onclick="window.deleteSelf('${s.id}')" class="text-inkLight hover:text-red-400 opacity-0 group-hover:opacity-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+        window.deleteSelf = async(id) => { await deleteDoc(doc(db, 'self_reflections', id)); };
+
+        // --- 0. 闪念胶囊 ---
+        const inboxForm = document.getElementById('inbox-form');
+        const inboxInput = document.getElementById('inbox-input');
+        const inboxList = document.getElementById('inbox-list');
+        const inboxCol = collection(db, 'inbox');
+        let currentCapsules = [];
+
+        onSnapshot(inboxCol, (snapshot) => {
+            currentCapsules = [];
+            snapshot.forEach((doc) => currentCapsules.push({ id: doc.id, ...doc.data() }));
+            currentCapsules.sort((a, b) => b.createdAt - a.createdAt);
+            renderInbox();
         });
 
-        function renderTodos() {
-            todoList.innerHTML = '';
-            if (currentTodos.length === 0) {
-                todoList.innerHTML = '<li class="text-center text-slate-400 text-sm py-4">暂无待办事项，今天很轻松！</li>';
-                return;
+        function renderInbox() {
+            inboxList.innerHTML = '';
+            if (currentCapsules.length === 0) {
+                inboxList.innerHTML = '<li class="text-center text-inkLight/60 text-sm py-6 font-serif italic">胶囊区很干净，大脑很轻松。</li>'; return;
             }
-            currentTodos.forEach(todo => {
+            currentCapsules.forEach(capsule => {
                 const li = document.createElement('li');
-                li.className = `group flex items-center justify-between p-3 rounded-xl border ${todo.done ? 'bg-slate-50 border-slate-100' : 'bg-white border-slate-200 hover:border-indigo-300'} transition-all`;
+                li.className = 'group flex items-start justify-between p-3.5 rounded-xl bg-[#FAF9F5] border border-borderLight hover:border-[#D4CDBC] hover:shadow-sm transition-all';
+                const d = new Date(capsule.createdAt);
                 li.innerHTML = `
-                    <div class="flex items-center gap-3 overflow-hidden">
-                        <button onclick="window.toggleTodo('${todo.id}', ${todo.done})" class="flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${todo.done ? 'bg-indigo-500 border-indigo-500' : 'border-slate-300 hover:border-indigo-400'}">
-                            ${todo.done ? '<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
-                        </button>
-                        <span class="text-sm truncate ${todo.done ? 'text-slate-400 line-through' : 'text-slate-700'} cursor-pointer" onclick="window.toggleTodo('${todo.id}', ${todo.done})">${todo.text}</span>
+                    <div class="flex flex-col gap-1.5 overflow-hidden">
+                        <span class="text-sm text-ink leading-relaxed">${capsule.text}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${d.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})}</span>
+                            <span class="text-[10px] bg-[#EAE5D9] text-inkLight px-1.5 py-0.5 rounded">待派发</span>
+                        </div>
                     </div>
-                    <button onclick="window.deleteTodo('${todo.id}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0 ml-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
+                    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="window.dispatchCapsule('${capsule.id}')" class="text-xs bg-ink border border-ink text-white hover:bg-inkLight px-2 py-1.5 rounded-lg transition-colors font-bold shadow-sm">派发流转</button>
+                        <button onclick="window.deleteCapsule('${capsule.id}')" class="text-inkLight hover:text-red-400 p-1 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    </div>
                 `;
-                todoList.appendChild(li);
+                inboxList.appendChild(li);
+            });
+        }
+        inboxForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (inboxInput.value.trim()) {
+                await setDoc(doc(inboxCol, Date.now().toString()), { text: inboxInput.value.trim(), createdAt: Date.now() });
+                inboxInput.value = '';
+            }
+        });
+        window.deleteCapsule = async (id) => { await deleteDoc(doc(db, 'inbox', id)); };
+        
+        window.dispatchCapsule = async (id) => { 
+            const capsule = currentCapsules.find(c => c.id === id);
+            if (!capsule) return;
+            const promptMsg = `将该念头派发到哪个维度？\n\n【1】🎯 左脑·里程碑 (目标执行)\n【2】🌱 左脑·无尽习惯 (待办提示)\n【3】💡 右脑·灵感星空 (视觉创意)\n【4】🌍 模块三·观世界 (万事思考)\n【5】🪞 北极星·观自己 (自我认知)\n\n请输入数字 1-5：`;
+            const choice = prompt(promptMsg, "1");
+            if (choice === null) return;
+            
+            const docId = Date.now().toString();
+            if (choice === '1') {
+                await setDoc(doc(db, 'skills', docId), { text: capsule.text, type: 'milestone', status: 'backlog', createdAt: Date.now() });
+            } else if (choice === '2') {
+                await setDoc(doc(db, 'skills', docId), { text: capsule.text, type: 'habit', status: 'wip', createdAt: Date.now() });
+            } else if (choice === '3') {
+                await setDoc(doc(db, 'inspirations', docId), { text: capsule.text, createdAt: Date.now() });
+            } else if (choice === '4') {
+                await setDoc(doc(db, 'world_reflections', docId), { text: capsule.text, createdAt: Date.now() });
+            } else if (choice === '5') {
+                await setDoc(doc(db, 'self_reflections', docId), { text: capsule.text, createdAt: Date.now() });
+            } else {
+                alert("无效输入，取消派发。"); return;
+            }
+            await deleteDoc(doc(db, 'inbox', id));
+        };
+
+        // --- 1. 财富 ---
+        const wealthForm = document.getElementById('wealth-form');
+        const wealthCol = collection(db, 'wealth');
+        let currentWealth = [];
+        onSnapshot(wealthCol, (snapshot) => {
+            currentWealth = [];
+            snapshot.forEach((doc) => currentWealth.push({ id: doc.id, ...doc.data() }));
+            currentWealth.sort((a, b) => b.createdAt - a.createdAt);
+            renderWealth();
+        });
+        function formatMoney(amount) { return '¥' + parseFloat(amount).toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+        function renderWealth() {
+            const wealthList = document.getElementById('wealth-list');
+            wealthList.innerHTML = '';
+            let balances = { cash: 0, steady: 0, long: 0 };
+            let monthlyExpense = 0;
+            const now = new Date();
+            currentWealth.forEach(t => {
+                const isIncome = t.type === 'income';
+                if (balances[t.account] !== undefined) balances[t.account] += t.amount * (isIncome ? 1 : -1);
+                if (!isIncome) {
+                    const txDate = new Date(t.createdAt);
+                    if (txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear()) monthlyExpense += parseFloat(t.amount);
+                }
+            });
+            document.getElementById('wealth-total').textContent = formatMoney(balances.cash + balances.steady + balances.long);
+            document.getElementById('wealth-monthly-expense').textContent = formatMoney(monthlyExpense);
+            document.getElementById('wealth-cash').textContent = formatMoney(balances.cash);
+            document.getElementById('wealth-steady').textContent = formatMoney(balances.steady);
+            document.getElementById('wealth-long').textContent = formatMoney(balances.long);
+            if (currentWealth.length === 0) return;
+            const accountNames = { cash: '现金', steady: '稳健', long: '长投' };
+            currentWealth.forEach(t => {
+                const isIncome = t.type === 'income';
+                const d = new Date(t.createdAt);
+                const li = document.createElement('li');
+                li.className = 'group flex items-center justify-between p-2 rounded-lg bg-[#FAF9F5] border border-borderLight hover:border-[#D4CDBC] transition-all';
+                li.innerHTML = `
+                    <div class="flex flex-col gap-0.5 overflow-hidden w-2/3">
+                        <div class="flex items-center gap-1.5"><span class="text-[9px] bg-[#EAE5D9] text-inkLight px-1 rounded flex-shrink-0">${accountNames[t.account]}</span><span class="text-[11px] text-ink font-bold truncate">${t.desc}</span></div>
+                        <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日</span>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <span class="text-[11px] font-bold ${isIncome ? 'text-[#839788]' : 'text-[#E29578]'}">${isIncome ? '+' : '-'}${parseFloat(t.amount).toLocaleString('zh-CN')}</span>
+                        <button onclick="window.deleteWealth('${t.id}')" class="text-inkLight hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    </div>
+                `;
+                wealthList.appendChild(li);
+            });
+        }
+        wealthForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('wealth-amount').value);
+            const desc = document.getElementById('wealth-desc');
+            if (!isNaN(amount) && desc.value.trim()) {
+                await setDoc(doc(wealthCol, Date.now().toString()), { desc: desc.value.trim(), amount, type: document.getElementById('wealth-type').value, account: document.getElementById('wealth-account').value, createdAt: Date.now() });
+                document.getElementById('wealth-amount').value = ''; desc.value = '';
+            }
+        });
+        window.deleteWealth = async (id) => { await deleteDoc(doc(db, 'wealth', id)); };
+
+        // --- 2. 身体 ---
+        const healthForm = document.getElementById('health-form');
+        const healthCol = collection(db, 'health');
+        let currentHealth = [];
+        onSnapshot(healthCol, (snapshot) => {
+            currentHealth = [];
+            snapshot.forEach((doc) => currentHealth.push({ id: doc.id, ...doc.data() }));
+            currentHealth.sort((a, b) => b.createdAt - a.createdAt);
+            renderHealth();
+        });
+        function renderHealth() {
+            const healthList = document.getElementById('health-list');
+            healthList.innerHTML = '';
+            let weeklyCount = 0;
+            const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+            currentHealth.forEach(h => { if (h.createdAt > sevenDaysAgo && h.activity !== '纯休息') weeklyCount++; });
+            document.getElementById('health-weekly-count').textContent = weeklyCount;
+            document.getElementById('health-current-state').textContent = currentHealth.length > 0 ? currentHealth[0].state.replace(/[^一-龥]/g, '') : '暂无反馈';
+            if (currentHealth.length === 0) return;
+            const stateColors = { '精力充沛': 'text-[#839788] bg-[#839788]/10', '状态平稳': 'text-accent bg-accent/10', '急需回血': 'text-[#E29578] bg-[#E29578]/10', '肌肉酸痛': 'text-inkLight bg-[#EAE5D9]' };
+            currentHealth.forEach(h => {
+                const colorClass = stateColors[h.state.replace(/[^一-龥]/g, '')] || 'text-ink bg-borderLight';
+                const d = new Date(h.createdAt);
+                const li = document.createElement('li');
+                li.className = 'group flex items-center justify-between p-2 rounded-lg bg-[#FAF9F5] border border-borderLight hover:border-[#D4CDBC] transition-all';
+                li.innerHTML = `
+                    <div class="flex flex-col gap-0.5 overflow-hidden w-2/3">
+                        <div class="flex items-center gap-1.5"><span class="text-[11px] text-ink font-bold truncate">${h.activity}</span><span class="text-[10px] text-inkLight/80">${h.duration}</span></div>
+                        <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${d.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'})}</span>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${colorClass}">${h.state}</span>
+                        <button onclick="window.deleteHealth('${h.id}')" class="text-inkLight hover:text-red-400 opacity-0 group-hover:opacity-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    </div>
+                `;
+                healthList.appendChild(li);
+            });
+        }
+        healthForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const duration = document.getElementById('health-duration');
+            if (duration.value.trim()) {
+                await setDoc(doc(healthCol, Date.now().toString()), { activity: document.getElementById('health-activity').value, duration: duration.value.trim(), state: document.getElementById('health-state').value, createdAt: Date.now() });
+                duration.value = '';
+            }
+        });
+        window.deleteHealth = async (id) => { await deleteDoc(doc(db, 'health', id)); };
+
+        // --- 3. 生活与内观 (拾光胶卷 + 观世界) ---
+        const tabExp = document.getElementById('tab-exp');
+        const tabWorld = document.getElementById('tab-world');
+        const contentExp = document.getElementById('content-exp');
+        const contentWorld = document.getElementById('content-world');
+
+        tabExp.addEventListener('click', () => {
+            tabExp.className = 'px-2 py-1 text-[10px] font-bold rounded-md bg-white shadow-sm text-ink transition-all';
+            tabWorld.className = 'px-2 py-1 text-[10px] font-bold rounded-md text-inkLight hover:text-ink transition-all cursor-pointer';
+            contentExp.classList.remove('hidden'); contentWorld.classList.add('hidden');
+        });
+        tabWorld.addEventListener('click', () => {
+            tabWorld.className = 'px-2 py-1 text-[10px] font-bold rounded-md bg-white shadow-sm text-ink transition-all';
+            tabExp.className = 'px-2 py-1 text-[10px] font-bold rounded-md text-inkLight hover:text-ink transition-all cursor-pointer';
+            contentWorld.classList.remove('hidden'); contentExp.classList.add('hidden');
+        });
+
+        // 3A: 拾光
+        const expCol = collection(db, 'experiences');
+        let currentExp = [];
+        let currentExpImageBase64 = null;
+        const expImage = document.getElementById('exp-image');
+        const expImgLabel = document.getElementById('exp-img-label');
+        
+        expImage.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) { currentExpImageBase64 = null; expImgLabel.textContent = '添加图片 (可选)'; return; }
+            expImgLabel.textContent = '已选择: ' + (file.name.length > 8 ? file.name.substring(0, 8) + '...' : file.name);
+            compressImage(file, (base64) => { currentExpImageBase64 = base64; });
+        });
+        onSnapshot(expCol, (snapshot) => {
+            currentExp = [];
+            snapshot.forEach((doc) => currentExp.push({ id: doc.id, ...doc.data() }));
+            currentExp.sort((a, b) => b.createdAt - a.createdAt);
+            renderExp();
+        });
+        function renderExp() {
+            const expList = document.getElementById('exp-list');
+            expList.innerHTML = '';
+            if (currentExp.length === 0) return;
+            const tagColors = { '日常微光': 'text-accent bg-accent/10', '链接周边': 'text-[#E29578] bg-[#E29578]/10', '探索地球': 'text-[#839788] bg-[#839788]/10', '心流时刻': 'text-inkLight bg-borderLight' };
+            currentExp.forEach(e => {
+                const colorClass = tagColors[e.tag] || 'text-ink bg-borderLight';
+                const d = new Date(e.createdAt);
+                let imgHTML = e.image ? `<img src="${e.image}" class="w-full h-32 object-cover rounded-lg mt-2 mb-1.5 border border-borderLight" alt="体验">` : '';
+                const li = document.createElement('li');
+                li.className = 'group flex flex-col p-3 rounded-xl bg-[#FAF9F5] border border-borderLight hover:border-[#D4CDBC] hover:shadow-sm transition-all relative';
+                li.innerHTML = `
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${colorClass}">${e.tag}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日</span>
+                            <button onclick="window.deleteExp('${e.id}')" class="text-inkLight hover:text-red-400 opacity-0 group-hover:opacity-100 absolute right-2 top-2"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                        </div>
+                    </div>
+                    ${imgHTML}
+                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words mt-1">${e.text}</p>
+                `;
+                expList.appendChild(li);
+            });
+        }
+        document.getElementById('exp-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const textEl = document.getElementById('exp-text');
+            if (textEl.value.trim()) {
+                const docData = { text: textEl.value.trim(), tag: document.getElementById('exp-tag').value, createdAt: Date.now() };
+                if (currentExpImageBase64) docData.image = currentExpImageBase64;
+                await setDoc(doc(expCol, Date.now().toString()), docData);
+                textEl.value = ''; expImage.value = ''; expImgLabel.textContent = '添加图片 (可选)'; currentExpImageBase64 = null;
+            }
+        });
+        window.deleteExp = async (id) => { await deleteDoc(doc(db, 'experiences', id)); };
+
+        // 3B: 观世界
+        const worldCol = collection(db, 'world_reflections');
+        let currentWorld = [];
+        onSnapshot(worldCol, (snapshot) => {
+            currentWorld = [];
+            snapshot.forEach(doc => currentWorld.push({id: doc.id, ...doc.data()}));
+            currentWorld.sort((a, b) => b.createdAt - a.createdAt);
+            renderWorld();
+        });
+        function renderWorld() {
+            const list = document.getElementById('world-list');
+            list.innerHTML = '';
+            if (currentWorld.length === 0) { list.innerHTML = '<li class="text-center text-inkLight/60 text-[11px] py-4 font-serif italic">暂无对外部世界的思考。</li>'; return; }
+            currentWorld.forEach(w => {
+                const d = new Date(w.createdAt);
+                const li = document.createElement('li');
+                li.className = 'group p-3 rounded-xl bg-[#FAF9F5] border border-borderLight hover:border-[#D4CDBC] transition-colors relative';
+                li.innerHTML = `
+                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words">${w.text}</p>
+                    <div class="flex justify-between items-center mt-2 pt-2 border-t border-borderLight/50">
+                        <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日</span>
+                        <button onclick="window.deleteWorld('${w.id}')" class="text-inkLight hover:text-red-400 opacity-0 group-hover:opacity-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+        document.getElementById('world-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const textEl = document.getElementById('world-text');
+            if (textEl.value.trim()) { await setDoc(doc(worldCol, Date.now().toString()), {text: textEl.value.trim(), createdAt: Date.now()}); textEl.value = ''; }
+        });
+        window.deleteWorld = async(id) => { await deleteDoc(doc(db, 'world_reflections', id)); };
+
+        // --- 4. 迭代与灵感 (左脑/右脑 + 习惯打卡划掉流转) ---
+        const tabLeft = document.getElementById('tab-left');
+        const tabRight = document.getElementById('tab-right');
+        const contentLeft = document.getElementById('content-left');
+        const contentRight = document.getElementById('content-right');
+        
+        tabLeft.addEventListener('click', () => {
+            tabLeft.className = 'px-2 py-1 text-[10px] font-bold rounded-md bg-white shadow-sm text-ink transition-all';
+            tabRight.className = 'px-2 py-1 text-[10px] font-bold rounded-md text-inkLight hover:text-ink transition-all cursor-pointer';
+            contentLeft.classList.remove('hidden'); contentRight.classList.add('hidden');
+        });
+        tabRight.addEventListener('click', () => {
+            tabRight.className = 'px-2 py-1 text-[10px] font-bold rounded-md bg-white shadow-sm text-ink transition-all';
+            tabLeft.className = 'px-2 py-1 text-[10px] font-bold rounded-md text-inkLight hover:text-ink transition-all cursor-pointer';
+            contentRight.classList.remove('hidden'); contentLeft.classList.add('hidden');
+        });
+
+        // 4A: 左脑
+        const subtabMilestone = document.getElementById('subtab-milestone');
+        const subtabHabit = document.getElementById('subtab-habit');
+        const viewMilestone = document.getElementById('view-milestone');
+        const viewHabit = document.getElementById('view-habit');
+
+        subtabMilestone.addEventListener('click', () => {
+            subtabMilestone.className = 'text-[11px] font-bold text-ink border-b-2 border-ink pb-1 transition-all';
+            subtabHabit.className = 'text-[11px] font-bold text-inkLight hover:text-ink border-b-2 border-transparent pb-1 transition-all';
+            viewMilestone.classList.remove('hidden'); viewHabit.classList.add('hidden');
+        });
+        subtabHabit.addEventListener('click', () => {
+            subtabHabit.className = 'text-[11px] font-bold text-ink border-b-2 border-ink pb-1 transition-all';
+            subtabMilestone.className = 'text-[11px] font-bold text-inkLight hover:text-ink border-b-2 border-transparent pb-1 transition-all';
+            viewHabit.classList.remove('hidden'); viewMilestone.classList.add('hidden');
+        });
+
+        // 4A-1: 🎯 里程碑
+        const skillsCol = collection(db, 'skills');
+        let currentSkills = [];
+        let currentHabitPrompts = [];
+
+        onSnapshot(skillsCol, (snapshot) => {
+            currentSkills = [];
+            currentHabitPrompts = [];
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.type === 'habit' && data.status === 'wip') {
+                    currentHabitPrompts.push({ id: doc.id, ...data });
+                } else if (data.type !== 'habit' || data.status !== 'wip') {
+                    if(data.type === 'milestone' || !data.type) currentSkills.push({ id: doc.id, ...data });
+                }
+            });
+            
+            const statusOrder = { 'wip': 1, 'backlog': 2, 'done': 3 };
+            currentSkills.sort((a, b) => {
+                const orderA = statusOrder[a.status] || 99;
+                const orderB = statusOrder[b.status] || 99;
+                if (orderA === orderB) return b.createdAt - a.createdAt;
+                return orderA - orderB;
+            });
+            renderSkills();
+            renderHabitPrompts();
+        });
+
+        function renderSkills() {
+            const skillList = document.getElementById('skill-list');
+            skillList.innerHTML = '';
+            if (currentSkills.length === 0) {
+                skillList.innerHTML = '<li class="text-center text-inkLight/60 text-[11px] py-4 font-serif italic">暂无目标，设个Flag吧。</li>'; return;
+            }
+            currentSkills.forEach(s => {
+                const isWip = s.status === 'wip';
+                const isDone = s.status === 'done';
+                let statusLabel = isWip ? '专注' : (isDone ? '完成' : '抽屉');
+                let bgClass = isWip ? 'bg-white border-borderLight shadow-sm' : (isDone ? 'bg-[#FAF9F5] border-borderLight/40 opacity-70' : 'bg-canvas border-dashed border-borderLight/80');
+                let tagClass = isWip ? 'bg-[#839788] text-white' : 'bg-[#EAE5D9] text-inkLight';
+                let textClass = (isWip || isDone) ? (isDone ? 'text-inkLight line-through decoration-inkLight/40 italic' : 'text-ink font-bold') : 'text-inkLight font-medium';
+
+                const li = document.createElement('li');
+                li.className = `group flex items-center justify-between p-2.5 rounded-lg border ${bgClass} hover:border-[#D4CDBC] transition-all`;
+                
+                let toggleHTML = !isDone 
+                    ? `<button onclick="window.markSkillDone('${s.id}')" class="text-[10px] text-inkLight hover:text-[#839788] px-1" title="标记为完成">✔︎</button>`
+                    : `<button onclick="window.markSkillWip('${s.id}')" class="text-[10px] text-inkLight hover:text-accent px-1" title="重新激活">↺</button>`;
+
+                li.innerHTML = `
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <span class="text-[9px] ${tagClass} px-1.5 py-0.5 rounded flex-shrink-0">🎯${statusLabel}</span>
+                        <span class="text-[11px] ${textClass} truncate">${s.text}</span>
+                    </div>
+                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 flex-shrink-0">
+                        ${toggleHTML}
+                        <button onclick="window.deleteSkill('${s.id}')" class="text-inkLight hover:text-red-400 p-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    </div>
+                `;
+                skillList.appendChild(li);
+            });
+        }
+        
+        document.getElementById('skill-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const textEl = document.getElementById('skill-text');
+            if (textEl.value.trim()) {
+                await setDoc(doc(skillsCol, Date.now().toString()), { text: textEl.value.trim(), type: 'milestone', status: document.getElementById('skill-status').value, createdAt: Date.now() });
+                textEl.value = '';
+            }
+        });
+        window.markSkillDone = async (id) => { await setDoc(doc(db, 'skills', id), { status: 'done' }, { merge: true }); };
+        window.markSkillWip = async (id) => { await setDoc(doc(db, 'skills', id), { status: 'wip' }, { merge: true }); };
+        window.deleteSkill = async (id) => { await deleteDoc(doc(db, 'skills', id)); };
+
+        // 4A-2: 🌱 习惯打卡
+        const habitsCol = collection(db, 'habits');
+        
+        function renderHabitPrompts() {
+            const container = document.getElementById('habit-prompts-container');
+            const list = document.getElementById('habit-prompts-list');
+            list.innerHTML = '';
+            
+            if (currentHabitPrompts.length === 0) { container.classList.add('hidden'); return; }
+            container.classList.remove('hidden');
+            
+            currentHabitPrompts.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'bg-accent/10 border border-accent/20 p-2.5 rounded-lg flex justify-between items-center';
+                div.innerHTML = `
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <span class="text-xs">🌱</span>
+                        <span class="text-[11px] text-accent font-bold truncate">${p.text}</span>
+                    </div>
+                    <button onclick="window.markHabitPromptDone('${p.id}', '${p.text.replace(/'/g, "\\'")}')" class="text-accent border border-accent/30 hover:bg-accent hover:text-white px-2 py-1 rounded transition-colors text-[10px] font-bold shadow-sm whitespace-nowrap">✔︎ 划掉</button>
+                `;
+                list.appendChild(div);
             });
         }
 
-        todoForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const text = todoInput.value.trim();
-            if (text) {
-                todoInput.value = '';
-                await setDoc(doc(todosCol, Date.now().toString()), { text, done: false, createdAt: Date.now() });
-            }
-        });
-
-        window.toggleTodo = async (id, currentStatus) => {
-            await updateDoc(doc(db, 'todos', id), { done: !currentStatus });
-        };
-        window.deleteTodo = async (id) => {
-            await deleteDoc(doc(db, 'todos', id));
+        // 划掉意图：删除提示，并自动生成打卡足迹
+        window.markHabitPromptDone = async (promptId, promptText) => { 
+            await setDoc(doc(habitsCol, Date.now().toString()), { 
+                name: "🌱 随想打卡", 
+                content: promptText, 
+                createdAt: Date.now() 
+            });
+            await deleteDoc(doc(db, 'skills', promptId)); 
         };
 
-        // ================= 2. 快速笔记 =================
-        const notesArea = document.getElementById('notes-area');
-        const saveStatus = document.getElementById('save-status');
-        const noteDoc = doc(db, 'notes', 'main');
-        let saveTimeout;
+        let currentHabits = [];
+        onSnapshot(habitsCol, (snapshot) => {
+            currentHabits = [];
+            snapshot.forEach((doc) => currentHabits.push({ id: doc.id, ...doc.data() }));
+            currentHabits.sort((a, b) => b.createdAt - a.createdAt);
+            renderHabits();
+        });
 
-        onSnapshot(noteDoc, (docSnap) => {
-            if (docSnap.exists() && document.activeElement !== notesArea) {
-                notesArea.value = docSnap.data().content || '';
+        function renderHabits() {
+            const habitList = document.getElementById('habit-list');
+            habitList.innerHTML = '';
+            if (currentHabits.length === 0) {
+                habitList.innerHTML = '<li class="text-center text-inkLight/60 text-[11px] py-4 font-serif italic">暂无日常习惯打卡记录。</li>'; return;
             }
-        });
-
-        notesArea.addEventListener('input', () => {
-            saveStatus.textContent = '保存中...';
-            saveStatus.classList.remove('opacity-0');
-            clearTimeout(saveTimeout);
-            
-            // 停下打字 1 秒后自动同步到云端
-            saveTimeout = setTimeout(async () => {
-                await setDoc(noteDoc, { content: notesArea.value });
-                saveStatus.textContent = '已同步云端';
-                setTimeout(() => saveStatus.classList.add('opacity-0'), 2000);
-            }, 1000);
-        });
-
-        // ================= 3. 财务理财 =================
-        const financeForm = document.getElementById('finance-form');
-        const financeType = document.getElementById('finance-type');
-        const financeAmount = document.getElementById('finance-amount');
-        const financeDesc = document.getElementById('finance-desc');
-        const financeList = document.getElementById('finance-list');
-        const totalIncomeEl = document.getElementById('total-income');
-        const totalExpenseEl = document.getElementById('total-expense');
-        const netBalanceEl = document.getElementById('net-balance');
-        const financeCol = collection(db, 'finance');
-        let currentFinance = [];
-
-        onSnapshot(financeCol, (snapshot) => {
-            currentFinance = [];
-            snapshot.forEach((doc) => currentFinance.push({ id: doc.id, ...doc.data() }));
-            currentFinance.sort((a, b) => b.createdAt - a.createdAt);
-            renderFinance();
-        });
-
-        function formatMoney(amount) {
-            return '¥' + parseFloat(amount).toFixed(2);
-        }
-
-        function renderFinance() {
-            financeList.innerHTML = '';
-            let income = 0, expense = 0;
-
-            if (currentFinance.length === 0) {
-                financeList.innerHTML = '<li class="text-center text-slate-400 text-sm py-4">暂无账单记录</li>';
-            } else {
-                currentFinance.forEach(t => {
-                    const isIncome = t.type === 'income';
-                    if (isIncome) income += t.amount; else expense += t.amount;
-
-                    const li = document.createElement('li');
-                    li.className = 'group flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 hover:bg-white hover:border-slate-200 transition-all';
-                    li.innerHTML = `
-                        <div class="flex flex-col overflow-hidden">
-                            <span class="text-sm font-medium text-slate-700 truncate">${t.desc}</span>
-                            <span class="text-[10px] text-slate-400">${new Date(t.date).toLocaleDateString()}</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-sm font-bold ${isIncome ? 'text-emerald-600' : 'text-rose-600'}">
-                                ${isIncome ? '+' : '-'}${formatMoney(t.amount)}
-                            </span>
-                            <button onclick="window.deleteTransaction('${t.id}')" class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            currentHabits.forEach(h => {
+                const d = new Date(h.createdAt);
+                const li = document.createElement('li');
+                li.className = 'group flex flex-col p-2.5 rounded-lg bg-[#FAF9F5] border border-borderLight hover:border-[#D4CDBC] transition-all relative';
+                li.innerHTML = `
+                    <div class="flex justify-between items-start mb-1.5">
+                        <span class="text-[10px] font-bold text-ink bg-[#EAE5D9] px-1.5 py-0.5 rounded">${h.name}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${d.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})}</span>
+                            <button onclick="window.deleteHabit('${h.id}')" class="text-inkLight hover:text-red-400 opacity-0 group-hover:opacity-100 absolute right-2 top-2">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
-                    `;
-                    financeList.appendChild(li);
-                });
-            }
-
-            const balance = income - expense;
-            totalIncomeEl.textContent = formatMoney(income);
-            totalExpenseEl.textContent = formatMoney(expense);
-            netBalanceEl.textContent = formatMoney(balance);
-            netBalanceEl.className = `text-sm font-bold ${balance < 0 ? 'text-red-600' : 'text-blue-700'}`;
+                    </div>
+                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words">${h.content}</p>
+                `;
+                habitList.appendChild(li);
+            });
         }
-
-        financeForm.addEventListener('submit', async (e) => {
+        document.getElementById('habit-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const amount = parseFloat(financeAmount.value);
-            const desc = financeDesc.value.trim();
-            const type = financeType.value;
-
-            if (!isNaN(amount) && desc) {
-                financeAmount.value = '';
-                financeDesc.value = '';
-                await setDoc(doc(financeCol, Date.now().toString()), { 
-                    desc, amount, type, date: new Date().toISOString(), createdAt: Date.now() 
+            const contentEl = document.getElementById('habit-content');
+            if (contentEl.value.trim()) {
+                await setDoc(doc(habitsCol, Date.now().toString()), { 
+                    name: document.getElementById('habit-name').value, 
+                    content: contentEl.value.trim(), 
+                    createdAt: Date.now() 
                 });
+                contentEl.value = '';
             }
         });
+        window.deleteHabit = async (id) => { await deleteDoc(doc(db, 'habits', id)); };
 
-        window.deleteTransaction = async (id) => {
-            await deleteDoc(doc(db, 'finance', id));
-        };
+        // 4B: 右脑 -> 💡 灵感
+        const inspireCol = collection(db, 'inspirations');
+        let currentInspire = [];
+        let currentInspireImageBase64 = null;
+        const inspireImage = document.getElementById('inspire-image');
+        const inspireImgLabel = document.getElementById('inspire-img-label');
+
+        inspireImage.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) { currentInspireImageBase64 = null; inspireImgLabel.textContent = '附加参考图'; return; }
+            inspireImgLabel.textContent = '已选: ' + (file.name.length > 6 ? file.name.substring(0, 6) + '...' : file.name);
+            compressImage(file, (base64) => { currentInspireImageBase64 = base64; });
+        });
+
+        onSnapshot(inspireCol, (snapshot) => {
+            currentInspire = [];
+            snapshot.forEach((doc) => currentInspire.push({ id: doc.id, ...doc.data() }));
+            currentInspire.sort((a, b) => b.createdAt - a.createdAt);
+            renderInspire();
+        });
+
+        function renderInspire() {
+            const inspireList = document.getElementById('inspire-list');
+            inspireList.innerHTML = '';
+            if (currentInspire.length === 0) {
+                inspireList.innerHTML = '<li class="text-center text-inkLight/60 text-[11px] py-4 font-serif italic">无垠的右脑星空，等待第一缕灵感。</li>'; return;
+            }
+            currentInspire.forEach(i => {
+                const li = document.createElement('li');
+                li.className = 'group p-3 rounded-md bg-[#FDFBF7] border border-[#EAE5D9] shadow-soft hover:-translate-y-0.5 transition-transform relative';
+                let imgHTML = i.image ? `<img src="${i.image}" class="w-full h-24 object-cover rounded mt-2 border border-borderLight" alt="灵感">` : '';
+                const d = new Date(i.createdAt);
+                li.innerHTML = `
+                    <div class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-6 h-2.5 bg-[#D4CDBC]/30 rounded-full blur-[1px]"></div>
+                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words mt-1">${i.text}</p>
+                    ${imgHTML}
+                    <div class="flex justify-between items-center mt-2 pt-2 border-t border-borderLight/50">
+                        <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日</span>
+                        <button onclick="window.deleteInspire('${i.id}')" class="text-inkLight hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    </div>
+                `;
+                inspireList.appendChild(li);
+            });
+        }
+        
+        document.getElementById('inspire-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const textEl = document.getElementById('inspire-text');
+            if (textEl.value.trim()) {
+                const docData = { text: textEl.value.trim(), createdAt: Date.now() };
+                if (currentInspireImageBase64) docData.image = currentInspireImageBase64;
+                await setDoc(doc(inspireCol, Date.now().toString()), docData);
+                textEl.value = ''; inspireImage.value = ''; inspireImgLabel.textContent = '附加参考图'; currentInspireImageBase64 = null;
+            }
+        });
+        window.deleteInspire = async (id) => { await deleteDoc(doc(db, 'inspirations', id)); };
+
     </script>
 </body>
 </html>
