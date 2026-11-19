@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>zari的数字人生</title>
     <!-- 开启全屏模式，隐藏浏览器地址栏 -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#f8fafc">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#f8fafc">
     <!-- 专属 App 图标 -->
-<link rel="apple-touch-icon" sizes="180x180" href="./icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="./icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -116,7 +116,7 @@
             opacity: 0;
         }
 
-        /* 动态交互流体光晕 (核心重构) */
+        /* 动态交互流体光晕 */
         @keyframes blobMorph {
             0%, 100% { 
                 border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; 
@@ -132,22 +132,53 @@
             }
         }
         .interactive-blob {
-            /* 15秒循环缓慢形变和自转 */
             animation: blobMorph 15s linear infinite;
-            /* 平滑的阻尼跟随效果 */
             transition: left 1s cubic-bezier(0.05, 0.9, 0.1, 1), top 1s cubic-bezier(0.05, 0.9, 0.1, 1);
+        }
+
+        /* 日历格子微交互 */
+        .cal-cell {
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+        .cal-cell:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 口令错误抖动动画 */
+        @keyframes shakeX {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .animate-shake {
+            animation: shakeX 0.35s ease-in-out;
         }
     </style>
 </head>
 <body class="font-sans min-h-screen p-4 md:p-8 selection:bg-accent selection:text-white relative overflow-x-hidden">
 
-    <!-- 全新交互式：随鼠标移动+形变的陶土色流体光晕 -->
+    <!-- 随鼠标移动+形变的陶土色流体光晕 -->
     <div id="cursor-glow" class="fixed w-[600px] h-[600px] bg-[#E29578] mix-blend-multiply filter blur-[100px] opacity-20 pointer-events-none z-0 interactive-blob" style="left: 50%; top: 50%;"></div>
     
-    <!-- 静态氛围光 (点缀页面右下角的灰绿色，丰富空间层次) -->
+    <!-- 静态氛围光 -->
     <div class="fixed top-[40%] right-1/4 w-[500px] h-[500px] bg-[#839788] rounded-full mix-blend-multiply filter blur-[120px] opacity-10 pointer-events-none z-0"></div>
 
-    <div class="max-w-7xl mx-auto space-y-6 relative z-10">
+    <div class="max-w-7xl mx-auto space-y-5 relative z-10 pb-8">
+
+        <!-- 顶栏：极简双视角切换器 (日常空间 / 财富金库) -->
+        <div class="flex justify-end">
+            <div class="inline-flex items-center bg-[#FDFCF9]/75 backdrop-blur-md p-1 rounded-xl border border-borderLight shadow-soft">
+                <button id="switch-daily" type="button" class="px-3.5 py-1.5 text-[11px] font-bold rounded-lg bg-white shadow-sm text-ink transition-all active:scale-95 flex items-center gap-1.5">
+                    <span>✨</span> 日常空间
+                </button>
+                <button id="switch-vault" type="button" class="px-3.5 py-1.5 text-[11px] font-bold rounded-lg text-inkLight hover:text-ink transition-all active:scale-95 flex items-center gap-1.5">
+                    <span id="vault-lock-icon">🔒</span> 财富金库
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== 视角一：日常空间 ==================== -->
+        <div id="view-daily" class="space-y-6">
         
         <!-- 一、 全局穹顶：人生北极星 (🪞观自己) -->
         <header class="oil-panel rounded-2xl p-6 relative overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-lg" onclick="toggleVision(event)">
@@ -169,7 +200,6 @@
                 <div class="pt-6 mt-6 border-t border-borderLight grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- 左侧：动态愿景编辑区 -->
                     <div class="space-y-6">
-                        <!-- 30岁的zari是怎样的 -->
                         <div class="group/item relative">
                             <div class="flex justify-between items-center mb-2">
                                 <h3 class="text-sm font-bold text-ink flex items-center gap-2">
@@ -189,7 +219,6 @@
                             </form>
                         </div>
 
-                        <!-- 想成为的人 -->
                         <div class="group/item relative">
                             <div class="flex justify-between items-center mb-2">
                                 <h3 class="text-sm font-bold text-ink flex items-center gap-2">
@@ -243,77 +272,8 @@
             </div>
         </section>
 
-        <!-- 三、 四大平行基本盘 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            <!-- 1. 财富与资产大盘 -->
-            <div class="oil-panel rounded-2xl p-5 flex flex-col h-[520px] transition-transform duration-500 hover:-translate-y-1">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-sm font-bold text-ink flex items-center gap-2">
-                        <svg class="w-4 h-4 text-[#839788]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        财富与资产
-                    </h2>
-                    <button id="toggle-wealth-visibility" class="text-inkLight hover:text-ink active:scale-90 transition-all focus:outline-none bg-borderLight/30 p-1 rounded-md" title="隐藏/显示金额">
-                        <svg id="eye-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                        </svg>
-                    </button>
-                </div>
-                
-                <div class="bg-gradient-to-br from-[#F8F6F0] to-[#F4F1EA] p-4 rounded-xl border border-borderLight mb-4 relative overflow-hidden flex-shrink-0 shadow-sm">
-                    <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-[#839788] opacity-10 rounded-full blur-xl"></div>
-                    <div class="flex justify-between items-end mb-3">
-                        <div>
-                            <p class="text-[9px] text-inkLight font-bold mb-1 uppercase tracking-wider">总净资产</p>
-                            <p class="text-xl font-bold text-ink wealth-value" id="wealth-total" data-amount="¥0.00">¥0.00</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[9px] text-inkLight font-bold mb-1 uppercase tracking-wider">当月总开销</p>
-                            <p class="text-lg font-bold text-[#E29578] wealth-value" id="wealth-monthly-expense" data-amount="¥0.00">¥0.00</p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2 border-t border-borderLight/60 pt-3">
-                        <div>
-                            <p class="text-[9px] text-inkLight mb-0.5">现金流</p>
-                            <p class="text-[11px] font-bold text-ink wealth-value" id="wealth-cash" data-amount="¥0.00">¥0.00</p>
-                        </div>
-                        <div>
-                            <p class="text-[9px] text-inkLight mb-0.5">稳健</p>
-                            <p class="text-[11px] font-bold text-[#839788] wealth-value" id="wealth-steady" data-amount="¥0.00">¥0.00</p>
-                        </div>
-                        <div>
-                            <p class="text-[9px] text-inkLight mb-0.5">长投</p>
-                            <p class="text-[11px] font-bold text-accent wealth-value" id="wealth-long" data-amount="¥0.00">¥0.00</p>
-                        </div>
-                    </div>
-                </div>
-
-                <form id="wealth-form" class="space-y-2.5 mb-4 flex-shrink-0">
-                    <div class="flex gap-2">
-                        <select id="wealth-type" class="w-[30%] input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none">
-                            <option value="income">入 (+)</option>
-                            <option value="expense">出 (-)</option>
-                        </select>
-                        <select id="wealth-account" class="w-[35%] input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none">
-                            <option value="cash">现金流</option>
-                            <option value="steady">稳健理财</option>
-                            <option value="long">长期投资</option>
-                        </select>
-                        <input type="number" id="wealth-amount" placeholder="金额" step="0.01" min="0.01" class="w-[35%] input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none" required>
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="text" id="wealth-desc" placeholder="描述" class="flex-1 input-paper rounded-lg px-3 py-1.5 text-[11px] text-ink focus:outline-none" required>
-                        <button type="submit" class="bg-ink text-canvas hover:bg-inkLight px-3 py-1.5 rounded-lg transition-colors font-bold text-[11px] whitespace-nowrap active:scale-95 shadow-sm">记录</button>
-                    </div>
-                </form>
-
-                <div class="flex-1 flex flex-col min-h-0 relative">
-                    <div class="absolute top-0 left-0 w-full h-4 bg-gradient-to-b from-[rgba(253,252,249,0.8)] to-transparent z-10 pointer-events-none"></div>
-                    <p class="text-[10px] font-bold text-inkLight/70 uppercase tracking-widest mb-2 mt-1">流水明细</p>
-                    <ul id="wealth-list" class="flex-1 overflow-y-auto space-y-2 pr-1 pb-2"></ul>
-                </div>
-            </div>
+        <!-- 三、 三大平行基本盘 (宽屏舒展布局) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
             <!-- 2. 身体与能量管理 -->
             <div class="oil-panel rounded-2xl p-5 flex flex-col h-[520px] transition-transform duration-500 hover:-translate-y-1">
@@ -379,7 +339,7 @@
                     </div>
                 </div>
                 
-                <!-- 3A: 拾光胶卷 (外部体验) -->
+                <!-- 3A: 拾光胶卷 -->
                 <div id="content-exp" class="flex-1 flex flex-col min-h-0">
                     <form id="exp-form" class="space-y-2.5 mb-4 flex-shrink-0">
                         <textarea id="exp-text" placeholder="记录一次心流、一句感动、或一段风景..." class="w-full input-paper rounded-xl px-3 py-2.5 text-[11px] text-ink focus:outline-none resize-none h-14 placeholder-inkLight/50 leading-relaxed shadow-inner" required></textarea>
@@ -407,7 +367,7 @@
                     </div>
                 </div>
 
-                <!-- 3B: 观世界 (万事万物思考) -->
+                <!-- 3B: 观世界 -->
                 <div id="content-world" class="flex-1 flex flex-col min-h-0 hidden">
                     <form id="world-form" class="space-y-2.5 mb-4 flex-shrink-0">
                         <textarea id="world-text" placeholder="记录对外部事物、社会现象、技术趋势的深度洞察..." class="w-full input-paper rounded-xl px-3 py-2.5 text-[11px] text-ink focus:outline-none resize-none h-20 placeholder-inkLight/50 leading-relaxed shadow-inner" required></textarea>
@@ -423,7 +383,7 @@
                 </div>
             </div>
 
-            <!-- 4. 技能迭代与灵感库 (左脑/右脑 主逻辑) -->
+            <!-- 4. 技能迭代与灵感库 (左脑/右脑) -->
             <div class="oil-panel rounded-2xl p-5 flex flex-col h-[520px] transition-transform duration-500 hover:-translate-y-1">
                 <div class="flex justify-between items-center mb-4 flex-shrink-0">
                     <h2 class="text-sm font-bold text-ink flex items-center gap-2">
@@ -436,7 +396,7 @@
                     </div>
                 </div>
 
-                <!-- 4A: 左脑 (包含里程碑和习惯两个二级菜单) -->
+                <!-- 4A: 左脑 -->
                 <div id="content-left" class="flex-1 flex flex-col min-h-0">
                     <div class="flex gap-4 mb-3 border-b border-borderLight/60 pb-2 flex-shrink-0">
                         <button id="subtab-milestone" class="text-[11px] font-bold text-ink border-b-2 border-ink pb-1 transition-all">🎯 里程碑</button>
@@ -444,14 +404,19 @@
                     </div>
 
                     <div id="view-milestone" class="flex-1 flex flex-col min-h-0">
-                        <form id="skill-form" class="space-y-2.5 mb-3 flex-shrink-0">
-                            <div class="flex gap-2">
-                                <select id="skill-status" class="w-[35%] input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none">
+                        <form id="skill-form" class="space-y-2 mb-3 flex-shrink-0">
+                            <div class="flex gap-1.5">
+                                <select id="skill-status" class="w-[32%] input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none">
                                     <option value="wip">⏳ 专注</option>
                                     <option value="backlog">📦 抽屉</option>
                                 </select>
                                 <input type="text" id="skill-text" placeholder="输入新的里程碑目标..." class="flex-1 input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none" required>
                                 <button type="submit" class="bg-ink text-canvas hover:bg-inkLight px-2.5 py-1.5 rounded-lg transition-colors font-bold text-[11px] whitespace-nowrap active:scale-95">列入</button>
+                            </div>
+                            <!-- 可选计划日期 -->
+                            <div class="flex items-center gap-1.5 input-paper rounded-lg px-2.5 py-1">
+                                <span class="text-[10px] text-inkLight whitespace-nowrap">📅 计划日期(可选)</span>
+                                <input type="date" id="skill-due-date" class="flex-1 bg-transparent text-[10px] text-ink focus:outline-none cursor-pointer">
                             </div>
                         </form>
                         <div class="flex-1 flex flex-col min-h-0 relative">
@@ -460,7 +425,6 @@
                     </div>
 
                     <div id="view-habit" class="flex-1 flex flex-col min-h-0 hidden">
-                        <!-- 习惯待办提示区 (从胶囊派发来的 Wip 任务) -->
                         <div id="habit-prompts-container" class="hidden flex-shrink-0 mb-3 border-b border-borderLight/50 pb-2.5">
                             <p class="text-[9px] font-bold text-accent uppercase tracking-widest mb-1.5 flex items-center gap-1 opacity-80"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 待办意图</p>
                             <div id="habit-prompts-list" class="flex flex-col gap-1.5"></div>
@@ -486,7 +450,7 @@
                     </div>
                 </div>
 
-                <!-- 4B: 右脑 灵感星空 (带图片情绪板) -->
+                <!-- 4B: 右脑 -->
                 <div id="content-right" class="flex-1 flex flex-col min-h-0 hidden">
                     <form id="inspire-form" class="space-y-2.5 mb-4 flex-shrink-0">
                         <textarea id="inspire-text" placeholder="捕捉天马行空的视觉灵感或想法..." class="w-full input-paper rounded-xl px-3 py-2.5 text-[11px] text-ink focus:outline-none resize-none h-12 placeholder-inkLight/50 leading-relaxed shadow-inner" required></textarea>
@@ -509,6 +473,257 @@
 
         </div>
 
+        <!-- 四、 底部宽屏：时光画卷 (全维度日历) -->
+        <section class="oil-panel rounded-2xl p-5 md:p-6">
+            <!-- 日历顶栏：标题 + 月份切换 + 维度筛选 -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-borderLight/70">
+                <div class="flex flex-wrap items-center gap-3 md:gap-4">
+                    <h2 class="text-sm font-bold text-ink flex items-center gap-2">
+                        <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        时光画卷 (Life Calendar)
+                    </h2>
+                    <div class="flex items-center gap-1.5 bg-[#F8F6F0] px-2 py-1 rounded-xl border border-borderLight">
+                        <button id="cal-prev" class="p-1 text-inkLight hover:text-ink hover:bg-white rounded-lg transition-all active:scale-90" title="上个月">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <span id="cal-month-label" class="text-xs font-bold text-ink min-w-[82px] text-center tracking-wide">2026年11月</span>
+                        <button id="cal-next" class="p-1 text-inkLight hover:text-ink hover:bg-white rounded-lg transition-all active:scale-90" title="下个月">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                        <button id="cal-today" class="ml-1 text-[10px] font-bold text-accent hover:bg-accent hover:text-white px-2 py-0.5 rounded-md transition-all active:scale-95">今天</button>
+                    </div>
+                </div>
+
+                <!-- 维度筛选胶囊 -->
+                <div class="flex bg-borderLight/40 p-0.5 rounded-lg border border-borderLight/50 shadow-inner self-start md:self-auto">
+                    <button data-cal-filter="all" class="cal-filter-btn px-2.5 py-1 text-[10px] font-bold rounded-md bg-white shadow-sm text-ink transition-all active:scale-95">全部</button>
+                    <button data-cal-filter="health" class="cal-filter-btn px-2.5 py-1 text-[10px] font-bold rounded-md text-inkLight hover:text-ink transition-all active:scale-95">运动</button>
+                    <button data-cal-filter="exp" class="cal-filter-btn px-2.5 py-1 text-[10px] font-bold rounded-md text-inkLight hover:text-ink transition-all active:scale-95">拾光</button>
+                    <button data-cal-filter="left" class="cal-filter-btn px-2.5 py-1 text-[10px] font-bold rounded-md text-inkLight hover:text-ink transition-all active:scale-95">左脑</button>
+                </div>
+            </div>
+
+            <!-- 主体：左日历 (7列) + 右当日详情 (5列) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- 左侧：月历网格 -->
+                <div class="lg:col-span-7 flex flex-col">
+                    <div class="grid grid-cols-7 gap-1.5 md:gap-2 mb-2 text-center">
+                        <span class="text-[10px] font-bold text-inkLight/70">一</span>
+                        <span class="text-[10px] font-bold text-inkLight/70">二</span>
+                        <span class="text-[10px] font-bold text-inkLight/70">三</span>
+                        <span class="text-[10px] font-bold text-inkLight/70">四</span>
+                        <span class="text-[10px] font-bold text-inkLight/70">五</span>
+                        <span class="text-[10px] font-bold text-[#E29578]/80">六</span>
+                        <span class="text-[10px] font-bold text-[#E29578]/80">日</span>
+                    </div>
+                    <div id="cal-grid" class="grid grid-cols-7 gap-1.5 md:gap-2"></div>
+                    
+                    <!-- 图例说明 -->
+                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-4 pt-3 border-t border-borderLight/60 text-[10px] text-inkLight">
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#E29578]"></span>运动记录</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#D4A373]"></span>生活拾光</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#839788]"></span>左脑已做</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full border-[1.5px] border-[#4A443B]"></span>左脑待做</span>
+                    </div>
+                </div>
+
+                <!-- 右侧：当日全景切片 -->
+                <div class="lg:col-span-5 lg:border-l border-borderLight/80 lg:pl-6 flex flex-col min-h-[320px] lg:max-h-[460px]">
+                    <div class="flex justify-between items-center mb-3 flex-shrink-0">
+                        <div>
+                            <h3 id="cal-detail-date" class="text-sm font-bold text-ink">2026年11月18日</h3>
+                            <p id="cal-detail-weekday" class="text-[10px] text-inkLight mt-0.5">星期三</p>
+                        </div>
+                        <span id="cal-detail-count" class="text-[10px] font-bold text-inkLight bg-[#F8F6F0] px-2.5 py-1 rounded-full border border-borderLight">0 条记录</span>
+                    </div>
+                    <div id="cal-detail-body" class="flex-1 overflow-y-auto space-y-4 pr-1 pb-2"></div>
+                </div>
+            </div>
+        </section>
+
+        </div> <!-- 结束 #view-daily -->
+
+        <!-- ==================== 视角二：财富金库 (独立宽屏隐私空间) ==================== -->
+        <div id="view-vault" class="hidden space-y-6 list-enter">
+            <!-- 金库顶栏 -->
+            <div class="oil-panel rounded-2xl p-6">
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                    <div>
+                        <p class="text-[10px] font-bold text-[#839788] uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                            Private Wealth Vault
+                        </p>
+                        <h2 class="text-xl font-bold text-ink">财富与资产金库</h2>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="toggle-wealth-visibility" type="button" class="flex items-center gap-1.5 text-[11px] font-bold text-inkLight hover:text-ink bg-[#F8F6F0] hover:bg-white px-3 py-1.5 rounded-lg border border-borderLight transition-all active:scale-95" title="隐藏/显示金额">
+                            <svg id="eye-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                            <span>金额掩码</span>
+                        </button>
+                        <button id="lock-vault-btn" type="button" class="flex items-center gap-1.5 text-[11px] font-bold text-[#E29578] bg-[#E29578]/10 hover:bg-[#E29578] hover:text-white px-3 py-1.5 rounded-lg border border-[#E29578]/20 transition-all active:scale-95">
+                            <span>🔒 锁定并返回</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 宽屏资产总览 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="bg-gradient-to-br from-[#F8F6F0] to-[#F4F1EA] p-4 rounded-xl border border-borderLight relative overflow-hidden shadow-sm lg:col-span-1">
+                        <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-[#839788] opacity-10 rounded-full blur-xl"></div>
+                        <p class="text-[10px] text-inkLight font-bold mb-1.5 uppercase tracking-wider">总净资产</p>
+                        <p class="text-2xl font-bold text-ink wealth-value" id="wealth-total" data-amount="¥0.00">¥0.00</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-[#F8F6F0] to-[#F4F1EA] p-4 rounded-xl border border-borderLight relative overflow-hidden shadow-sm lg:col-span-1">
+                        <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-[#E29578] opacity-10 rounded-full blur-xl"></div>
+                        <p class="text-[10px] text-inkLight font-bold mb-1.5 uppercase tracking-wider">当月总开销</p>
+                        <p class="text-2xl font-bold text-[#E29578] wealth-value" id="wealth-monthly-expense" data-amount="¥0.00">¥0.00</p>
+                    </div>
+                    <div class="bg-[#FAF9F5] p-4 rounded-xl border border-borderLight/80 flex flex-col justify-center">
+                        <p class="text-[10px] text-inkLight font-bold mb-1">日常现金流</p>
+                        <p class="text-lg font-bold text-ink wealth-value" id="wealth-cash" data-amount="¥0.00">¥0.00</p>
+                    </div>
+                    <div class="bg-[#FAF9F5] p-4 rounded-xl border border-borderLight/80 flex flex-col justify-center">
+                        <p class="text-[10px] text-inkLight font-bold mb-1">稳健理财</p>
+                        <p class="text-lg font-bold text-[#839788] wealth-value" id="wealth-steady" data-amount="¥0.00">¥0.00</p>
+                    </div>
+                    <div class="bg-[#FAF9F5] p-4 rounded-xl border border-borderLight/80 flex flex-col justify-center">
+                        <p class="text-[10px] text-inkLight font-bold mb-1">长期投资</p>
+                        <p class="text-lg font-bold text-accent wealth-value" id="wealth-long" data-amount="¥0.00">¥0.00</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 宽屏记账与流水双栏 -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- 左侧：记账表单 -->
+                <div class="oil-panel rounded-2xl p-6 lg:col-span-5">
+                    <h3 class="text-sm font-bold text-ink mb-4 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#839788]"></span> 新增收支记录
+                    </h3>
+                    <form id="wealth-form" class="space-y-3.5">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-inkLight mb-1">类型</label>
+                                <select id="wealth-type" class="w-full input-paper rounded-xl px-3 py-2.5 text-xs text-ink focus:outline-none">
+                                    <option value="expense">支出 (-)</option>
+                                    <option value="income">存入 (+)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-inkLight mb-1">账户分类</label>
+                                <select id="wealth-account" class="w-full input-paper rounded-xl px-3 py-2.5 text-xs text-ink focus:outline-none">
+                                    <option value="cash">日常现金流</option>
+                                    <option value="steady">稳健理财</option>
+                                    <option value="long">长期投资</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="wealth-category-wrap">
+                            <label id="wealth-category-label" class="block text-[10px] font-bold text-inkLight mb-1">用途分类 (现金流支出)</label>
+                            <select id="wealth-category" class="w-full input-paper rounded-xl px-3 py-2.5 text-xs text-ink focus:outline-none">
+                                <option value="日常花销">日常花销</option>
+                                <option value="房租通勤话费">房租通勤话费</option>
+                                <option value="父母">父母</option>
+                                <option value="约会">约会</option>
+                                <option value="购物">购物</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-inkLight mb-1">金额 (¥)</label>
+                            <input type="number" id="wealth-amount" placeholder="0.00" step="0.01" min="0.01" class="w-full input-paper rounded-xl px-3.5 py-2.5 text-xs text-ink focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-inkLight mb-1">备注说明</label>
+                            <input type="text" id="wealth-desc" placeholder="如：晚餐、房租、基金定投..." class="w-full input-paper rounded-xl px-3.5 py-2.5 text-xs text-ink focus:outline-none" required>
+                        </div>
+                        <button type="submit" class="w-full bg-ink text-canvas hover:bg-inkLight py-2.5 rounded-xl transition-all font-bold text-xs active:scale-[0.98] shadow-sm">
+                            记录到账本
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 右侧：流水明细 (带时间与用途筛选) -->
+                <div class="oil-panel rounded-2xl p-6 lg:col-span-7 flex flex-col h-[520px]">
+                    <div class="flex flex-wrap justify-between items-center gap-2 mb-3 flex-shrink-0">
+                        <h3 class="text-sm font-bold text-ink flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-accent"></span> 流水明细
+                        </h3>
+                        <button id="wealth-filter-reset" type="button" class="hidden text-[10px] font-bold text-accent hover:bg-accent hover:text-white px-2 py-0.5 rounded-md border border-accent/30 transition-all active:scale-95">
+                            重置筛选
+                        </button>
+                    </div>
+
+                    <!-- 筛选栏：时间 + 用途 -->
+                    <div class="flex flex-wrap items-center gap-2 mb-3 pb-3 border-b border-borderLight/70 flex-shrink-0">
+                        <select id="wealth-filter-time" class="input-paper rounded-lg px-2.5 py-1.5 text-[11px] text-ink focus:outline-none font-medium">
+                            <option value="all">📅 全部时间</option>
+                            <option value="this_month">📅 本月</option>
+                            <option value="last_month">📅 上月</option>
+                            <option value="this_year">📅 今年</option>
+                            <option value="custom_month">📅 指定月份</option>
+                        </select>
+                        <input type="month" id="wealth-filter-month" class="hidden input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none cursor-pointer">
+                        <select id="wealth-filter-category" class="input-paper rounded-lg px-2.5 py-1.5 text-[11px] text-ink focus:outline-none font-medium">
+                            <option value="all">🏷️ 全部用途/来源</option>
+                            <optgroup label="支出用途">
+                                <option value="房租通勤话费">房租通勤话费</option>
+                                <option value="日常花销">日常花销</option>
+                                <option value="父母">父母</option>
+                                <option value="约会">约会</option>
+                                <option value="购物">购物</option>
+                            </optgroup>
+                            <optgroup label="进账来源">
+                                <option value="工资">工资</option>
+                                <option value="副业/接单">副业/接单</option>
+                                <option value="理财收益">理财收益</option>
+                                <option value="其他进账">其他进账</option>
+                            </optgroup>
+                            <option value="其他">其他 / 未分类</option>
+                        </select>
+                    </div>
+
+                    <!-- 筛选统计条 -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 bg-[#F8F6F0] px-3 py-2 rounded-xl border border-borderLight/80 mb-3 flex-shrink-0 text-[10.5px]">
+                        <span id="wealth-filter-count" class="text-inkLight font-bold">共 0 笔记录</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-inkLight">支出 <strong id="wealth-filter-expense" class="text-[#E29578] wealth-value" data-amount="¥0.00">¥0.00</strong></span>
+                            <span class="text-inkLight">存入 <strong id="wealth-filter-income" class="text-[#839788] wealth-value" data-amount="¥0.00">¥0.00</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 flex flex-col min-h-0 relative">
+                        <ul id="wealth-list" class="flex-1 overflow-y-auto space-y-2.5 pr-1 pb-2"></ul>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- 结束 #view-vault -->
+
+    </div>
+
+    <!-- 口令验证弹窗 (0726) -->
+    <div id="vault-passcode-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-[#4A443B]/25 backdrop-blur-sm p-4">
+        <div id="vault-passcode-card" class="oil-panel rounded-2xl p-6 w-full max-w-xs bg-[#FDFCF9]/95 shadow-2xl border border-borderLight text-center space-y-4">
+            <div class="w-10 h-10 mx-auto rounded-full bg-accent/15 text-accent flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-bold text-ink">进入财富金库</h3>
+                <p class="text-[11px] text-inkLight mt-1">请输入 4 位访问口令</p>
+            </div>
+            <form id="vault-passcode-form" class="space-y-3">
+                <input type="password" id="vault-passcode-input" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"
+                       class="w-full input-paper rounded-xl px-4 py-3 text-center text-lg font-bold tracking-[0.6em] text-ink focus:outline-none">
+                <p id="vault-passcode-error" class="text-[10px] text-[#E29578] font-bold h-3.5 opacity-0 transition-opacity">口令不正确，请重试</p>
+                <div class="flex gap-2 pt-1">
+                    <button type="button" id="vault-passcode-cancel" class="flex-1 py-2 rounded-xl text-xs font-bold text-inkLight bg-[#F8F6F0] hover:bg-borderLight/60 transition-colors">取消</button>
+                    <button type="submit" class="flex-1 py-2 rounded-xl text-xs font-bold text-white bg-ink hover:bg-inkLight transition-colors active:scale-95">解锁</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Firebase 云端逻辑 -->
@@ -527,6 +742,35 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        // --- 工具函数 ---
+        function toDateKey(dateOrTs) {
+            const d = new Date(dateOrTs);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        function formatTimeHM(ts) {
+            return new Date(ts).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function formatDurationText(ms) {
+            const totalHours = Math.max(1, Math.round(ms / (1000 * 60 * 60)));
+            const days = Math.floor(totalHours / 24);
+            const hours = totalHours % 24;
+            if (days > 0 && hours > 0) return `${days}天${hours}小时`;
+            if (days > 0) return `${days}天`;
+            return `${hours}小时`;
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[m]));
+        }
 
         // --- 全局互动光晕跟随鼠标 ---
         const cursorGlow = document.getElementById('cursor-glow');
@@ -567,7 +811,6 @@
             icon.style.transform = details.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
         };
 
-        // 动态愿景逻辑
         const visionDocRef = doc(db, 'visions', 'current');
         let currentVisions = {
             vision30: "建立属于自己的跨界设计工作室，实现财务自由，能够在世界任何一个冲浪胜地旅居并远程工作，拥有完全自主的时间与创作权。",
@@ -580,7 +823,6 @@
             }
             document.getElementById('display-vision30').textContent = currentVisions.vision30;
             document.getElementById('input-vision30').value = currentVisions.vision30;
-            
             document.getElementById('display-visionPerson').textContent = currentVisions.visionPerson;
             document.getElementById('input-visionPerson').value = currentVisions.visionPerson;
         });
@@ -628,7 +870,7 @@
                 li.className = `group relative p-3 rounded-xl bg-[#FAF9F5] border border-borderLight hover:border-[#D4A373]/30 hover:shadow-sm transition-all duration-300 list-enter`;
                 li.style.animationDelay = `${index * 0.05}s`;
                 li.innerHTML = `
-                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words">${s.text}</p>
+                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words">${escapeHTML(s.text)}</p>
                     <div class="flex justify-between items-center mt-2 pt-2 border-t border-borderLight/50">
                         <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日</span>
                         <button onclick="window.deleteSelf('${s.id}')" class="text-inkLight hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all active:scale-90"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
@@ -667,7 +909,7 @@
                 const d = new Date(capsule.createdAt);
                 li.innerHTML = `
                     <div class="flex flex-col gap-1.5 overflow-hidden">
-                        <span class="text-sm text-ink leading-relaxed font-medium">${capsule.text}</span>
+                        <span class="text-sm text-ink leading-relaxed font-medium">${escapeHTML(capsule.text)}</span>
                         <div class="flex items-center gap-2">
                             <span class="text-[10px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${d.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})}</span>
                             <span class="text-[9px] font-bold bg-[#EAE5D9] text-inkLight px-1.5 py-0.5 rounded">待派发</span>
@@ -700,7 +942,7 @@
             
             const docId = Date.now().toString();
             if (choice === '1') {
-                await setDoc(doc(db, 'skills', docId), { text: capsule.text, type: 'milestone', status: 'backlog', createdAt: Date.now() });
+                await setDoc(doc(db, 'skills', docId), { text: capsule.text, type: 'milestone', status: 'backlog', dueDate: null, createdAt: Date.now() });
             } else if (choice === '2') {
                 await setDoc(doc(db, 'skills', docId), { text: capsule.text, type: 'habit', status: 'wip', createdAt: Date.now() });
             } else if (choice === '3') {
@@ -738,7 +980,74 @@
             updateWealthVisibility();
         });
 
-        const wealthForm = document.getElementById('wealth-form');
+        // 类型与账户切换时联动更新用途/进账分类
+        const wealthTypeSelect = document.getElementById('wealth-type');
+        const wealthAccountSelect = document.getElementById('wealth-account');
+        const wealthCategoryWrap = document.getElementById('wealth-category-wrap');
+        const wealthCategoryLabel = document.getElementById('wealth-category-label');
+        const wealthCategorySelect = document.getElementById('wealth-category');
+
+        const EXPENSE_CATEGORIES = ['日常花销', '房租通勤话费', '父母', '约会', '购物', '其他'];
+        const INCOME_CATEGORIES = ['工资', '副业/接单', '理财收益', '其他进账'];
+
+        function syncWealthCategoryOptions() {
+            const isIncome = wealthTypeSelect.value === 'income';
+            const account = wealthAccountSelect.value;
+
+            if (isIncome) {
+                wealthCategoryWrap.classList.remove('hidden');
+                wealthCategoryLabel.textContent = '进账分类 (收入来源)';
+                const prevVal = wealthCategorySelect.value;
+                wealthCategorySelect.innerHTML = INCOME_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
+                if (INCOME_CATEGORIES.includes(prevVal)) {
+                    wealthCategorySelect.value = prevVal;
+                } else {
+                    wealthCategorySelect.value = (account === 'steady' || account === 'long') ? '理财收益' : '工资';
+                }
+            } else {
+                if (account === 'cash') {
+                    wealthCategoryWrap.classList.remove('hidden');
+                    wealthCategoryLabel.textContent = '用途分类 (现金流支出)';
+                    const prevVal = wealthCategorySelect.value;
+                    wealthCategorySelect.innerHTML = EXPENSE_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
+                    if (EXPENSE_CATEGORIES.includes(prevVal)) {
+                        wealthCategorySelect.value = prevVal;
+                    }
+                } else {
+                    wealthCategoryWrap.classList.add('hidden');
+                }
+            }
+        }
+        wealthTypeSelect.addEventListener('change', syncWealthCategoryOptions);
+        wealthAccountSelect.addEventListener('change', syncWealthCategoryOptions);
+        syncWealthCategoryOptions();
+
+        // 流水筛选状态与控件绑定
+        const wealthFilterTime = document.getElementById('wealth-filter-time');
+        const wealthFilterMonth = document.getElementById('wealth-filter-month');
+        const wealthFilterCategory = document.getElementById('wealth-filter-category');
+        const wealthFilterReset = document.getElementById('wealth-filter-reset');
+
+        const initMonthStr = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+        wealthFilterMonth.value = initMonthStr;
+
+        wealthFilterTime.addEventListener('change', () => {
+            if (wealthFilterTime.value === 'custom_month') {
+                wealthFilterMonth.classList.remove('hidden');
+            } else {
+                wealthFilterMonth.classList.add('hidden');
+            }
+            renderWealth();
+        });
+        wealthFilterMonth.addEventListener('change', renderWealth);
+        wealthFilterCategory.addEventListener('change', renderWealth);
+        wealthFilterReset.addEventListener('click', () => {
+            wealthFilterTime.value = 'all';
+            wealthFilterMonth.classList.add('hidden');
+            wealthFilterCategory.value = 'all';
+            renderWealth();
+        });
+
         const wealthCol = collection(db, 'wealth');
         let currentWealth = [];
         onSnapshot(wealthCol, (snapshot) => {
@@ -748,6 +1057,39 @@
             renderWealth();
         });
         function formatMoney(amount) { return '¥' + parseFloat(amount).toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+
+        function matchesWealthFilters(t) {
+            const timeVal = wealthFilterTime.value;
+            const catVal = wealthFilterCategory.value;
+            const txDate = new Date(t.createdAt);
+            const now = new Date();
+
+            // 1. 时间筛选
+            if (timeVal === 'this_month') {
+                if (txDate.getFullYear() !== now.getFullYear() || txDate.getMonth() !== now.getMonth()) return false;
+            } else if (timeVal === 'last_month') {
+                const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                if (txDate.getFullYear() !== lastMonthDate.getFullYear() || txDate.getMonth() !== lastMonthDate.getMonth()) return false;
+            } else if (timeVal === 'this_year') {
+                if (txDate.getFullYear() !== now.getFullYear()) return false;
+            } else if (timeVal === 'custom_month' && wealthFilterMonth.value) {
+                const [fy, fm] = wealthFilterMonth.value.split('-').map(Number);
+                if (txDate.getFullYear() !== fy || (txDate.getMonth() + 1) !== fm) return false;
+            }
+
+            // 2. 用途筛选
+            if (catVal !== 'all') {
+                const txCat = t.category || '其他';
+                if (catVal === '其他') {
+                    const knownCats = ['房租通勤话费', '日常花销', '父母', '约会', '购物', '工资', '副业/接单', '理财收益', '其他进账'];
+                    if (knownCats.includes(txCat)) return false;
+                } else {
+                    if (txCat !== catVal) return false;
+                }
+            }
+            return true;
+        }
+
         function renderWealth() {
             const wealthList = document.getElementById('wealth-list');
             wealthList.innerHTML = '';
@@ -776,19 +1118,64 @@
             els.cash.setAttribute('data-amount', formatMoney(balances.cash));
             els.steady.setAttribute('data-amount', formatMoney(balances.steady));
             els.long.setAttribute('data-amount', formatMoney(balances.long));
+
+            // 筛选状态与筛选统计
+            const isFiltered = wealthFilterTime.value !== 'all' || wealthFilterCategory.value !== 'all';
+            wealthFilterReset.classList.toggle('hidden', !isFiltered);
+
+            const filteredWealth = currentWealth.filter(matchesWealthFilters);
+            let filteredExpense = 0;
+            let filteredIncome = 0;
+            filteredWealth.forEach(t => {
+                if (t.type === 'income') filteredIncome += parseFloat(t.amount);
+                else filteredExpense += parseFloat(t.amount);
+            });
+
+            document.getElementById('wealth-filter-count').textContent = `共 ${filteredWealth.length} 笔记录`;
+            document.getElementById('wealth-filter-expense').setAttribute('data-amount', formatMoney(filteredExpense));
+            document.getElementById('wealth-filter-income').setAttribute('data-amount', formatMoney(filteredIncome));
+
             updateWealthVisibility();
 
-            if (currentWealth.length === 0) return;
+            if (currentWealth.length === 0) {
+                wealthList.innerHTML = '<li class="text-center text-inkLight/60 text-[11px] py-8 font-serif italic">暂无资产流水记录</li>';
+                return;
+            }
+            if (filteredWealth.length === 0) {
+                wealthList.innerHTML = '<li class="text-center text-inkLight/60 text-[11px] py-8 font-serif italic">当前筛选条件下暂无流水记录</li>';
+                return;
+            }
+
             const accountNames = { cash: '现金', steady: '稳健', long: '长投' };
-            currentWealth.forEach((t, index) => {
+            const categoryColors = {
+                '房租通勤话费': 'bg-[#4A443B]/10 text-ink',
+                '日常花销': 'bg-accent/15 text-accent',
+                '父母': 'bg-[#839788]/15 text-[#839788]',
+                '约会': 'bg-[#E29578]/15 text-[#E29578]',
+                '购物': 'bg-[#D4A373]/25 text-[#9C6B3B]',
+                '工资': 'bg-[#839788]/20 text-[#5A7060]',
+                '副业/接单': 'bg-accent/20 text-[#9C6B3B]',
+                '理财收益': 'bg-[#839788]/15 text-[#647D6A]',
+                '其他进账': 'bg-[#EAE5D9] text-ink',
+                '其他': 'bg-[#EAE5D9] text-inkLight'
+            };
+
+            filteredWealth.forEach((t, index) => {
                 const isIncome = t.type === 'income';
                 const d = new Date(t.createdAt);
+                const catBadge = t.category
+                    ? `<span class="text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0 ${categoryColors[t.category] || 'bg-[#EAE5D9] text-inkLight'}">${escapeHTML(t.category)}</span>`
+                    : '';
                 const li = document.createElement('li');
                 li.className = `group flex items-center justify-between p-2.5 rounded-lg bg-[#FAF9F5] border border-borderLight hover:border-[#D4CDBC] hover:shadow-sm transition-all duration-300 list-enter`;
-                li.style.animationDelay = `${index * 0.05}s`;
+                li.style.animationDelay = `${Math.min(index, 12) * 0.04}s`;
                 li.innerHTML = `
                     <div class="flex flex-col gap-0.5 overflow-hidden w-2/3">
-                        <div class="flex items-center gap-1.5"><span class="text-[9px] font-bold bg-[#EAE5D9] text-inkLight px-1.5 py-0.5 rounded flex-shrink-0">${accountNames[t.account]}</span><span class="text-[11px] text-ink font-bold truncate">${t.desc}</span></div>
+                        <div class="flex items-center gap-1.5 overflow-hidden">
+                            <span class="text-[9px] font-bold bg-[#EAE5D9] text-inkLight px-1.5 py-0.5 rounded flex-shrink-0">${accountNames[t.account]}</span>
+                            ${catBadge}
+                            <span class="text-[11px] text-ink font-bold truncate">${escapeHTML(t.desc)}</span>
+                        </div>
                         <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日</span>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
@@ -803,8 +1190,18 @@
             e.preventDefault();
             const amount = parseFloat(document.getElementById('wealth-amount').value);
             const desc = document.getElementById('wealth-desc');
+            const type = document.getElementById('wealth-type').value;
+            const account = document.getElementById('wealth-account').value;
+            const category = (type === 'income' || account === 'cash') ? document.getElementById('wealth-category').value : null;
             if (!isNaN(amount) && desc.value.trim()) {
-                await setDoc(doc(wealthCol, Date.now().toString()), { desc: desc.value.trim(), amount, type: document.getElementById('wealth-type').value, account: document.getElementById('wealth-account').value, createdAt: Date.now() });
+                await setDoc(doc(wealthCol, Date.now().toString()), {
+                    desc: desc.value.trim(),
+                    amount,
+                    type,
+                    account,
+                    category,
+                    createdAt: Date.now()
+                });
                 document.getElementById('wealth-amount').value = ''; desc.value = '';
             }
         });
@@ -818,6 +1215,7 @@
             snapshot.forEach((doc) => currentHealth.push({ id: doc.id, ...doc.data() }));
             currentHealth.sort((a, b) => b.createdAt - a.createdAt);
             renderHealth();
+            renderCalendar();
         });
         function renderHealth() {
             const healthList = document.getElementById('health-list');
@@ -837,11 +1235,11 @@
                 li.style.animationDelay = `${index * 0.05}s`;
                 li.innerHTML = `
                     <div class="flex flex-col gap-0.5 overflow-hidden w-2/3">
-                        <div class="flex items-center gap-1.5"><span class="text-[11px] text-ink font-bold truncate">${h.activity}</span><span class="text-[10px] text-inkLight/80 font-medium">${h.duration}</span></div>
+                        <div class="flex items-center gap-1.5"><span class="text-[11px] text-ink font-bold truncate">${escapeHTML(h.activity)}</span><span class="text-[10px] text-inkLight/80 font-medium">${escapeHTML(h.duration)}</span></div>
                         <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${d.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'})}</span>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${colorClass}">${h.state}</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${colorClass}">${escapeHTML(h.state)}</span>
                         <button onclick="window.deleteHealth('${h.id}')" class="text-inkLight hover:text-red-400 opacity-0 group-hover:opacity-100 transition-colors active:scale-90"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                     </div>
                 `;
@@ -892,6 +1290,7 @@
             snapshot.forEach((doc) => currentExp.push({ id: doc.id, ...doc.data() }));
             currentExp.sort((a, b) => b.createdAt - a.createdAt);
             renderExp();
+            renderCalendar();
         });
         function renderExp() {
             const expList = document.getElementById('exp-list');
@@ -907,14 +1306,14 @@
                 li.style.animationDelay = `${index * 0.05}s`;
                 li.innerHTML = `
                     <div class="flex justify-between items-start mb-1">
-                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${colorClass}">${e.tag}</span>
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${colorClass}">${escapeHTML(e.tag)}</span>
                         <div class="flex items-center gap-2">
                             <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日</span>
                             <button onclick="window.deleteExp('${e.id}')" class="text-inkLight hover:text-red-400 opacity-0 group-hover:opacity-100 transition-colors absolute right-2 top-2 active:scale-90"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                         </div>
                     </div>
                     ${imgHTML}
-                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words mt-1">${e.text}</p>
+                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words mt-1">${escapeHTML(e.text)}</p>
                 `;
                 expList.appendChild(li);
             });
@@ -949,7 +1348,7 @@
                 li.className = `group p-3 rounded-xl bg-[#FAF9F5] border border-borderLight hover:border-[#839788]/30 hover:shadow-sm transition-all duration-300 relative list-enter`;
                 li.style.animationDelay = `${index * 0.05}s`;
                 li.innerHTML = `
-                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words">${w.text}</p>
+                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words">${escapeHTML(w.text)}</p>
                     <div class="flex justify-between items-center mt-2 pt-2 border-t border-borderLight/50">
                         <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日</span>
                         <button onclick="window.deleteWorld('${w.id}')" class="text-inkLight hover:text-red-400 opacity-0 group-hover:opacity-100 transition-colors active:scale-90"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
@@ -982,7 +1381,6 @@
             contentRight.classList.remove('hidden'); contentLeft.classList.add('hidden');
         });
 
-        // 4A: 左脑
         const subtabMilestone = document.getElementById('subtab-milestone');
         const subtabHabit = document.getElementById('subtab-habit');
         const viewMilestone = document.getElementById('view-milestone');
@@ -1025,6 +1423,7 @@
             });
             renderSkills();
             renderHabitPrompts();
+            renderCalendar();
         });
 
         function renderSkills() {
@@ -1049,10 +1448,17 @@
                     ? `<button onclick="window.markSkillDone('${s.id}')" class="text-[10px] text-inkLight hover:text-[#839788] px-1 transition-colors active:scale-90" title="标记为完成">✔︎</button>`
                     : `<button onclick="window.markSkillWip('${s.id}')" class="text-[10px] text-inkLight hover:text-accent px-1 transition-colors active:scale-90" title="重新激活">↺</button>`;
 
+                let dueBadge = '';
+                if (s.dueDate && !isDone) {
+                    const parts = s.dueDate.split('-');
+                    dueBadge = `<span class="text-[9px] text-inkLight/80 bg-[#F4F1EA] px-1.5 py-0.5 rounded flex-shrink-0">📅 ${parseInt(parts[1])}/${parseInt(parts[2])}</span>`;
+                }
+
                 li.innerHTML = `
-                    <div class="flex items-center gap-2 overflow-hidden">
+                    <div class="flex items-center gap-1.5 overflow-hidden">
                         <span class="text-[9px] ${tagClass} px-1.5 py-0.5 rounded flex-shrink-0">🎯${statusLabel}</span>
-                        <span class="text-[11px] ${textClass} truncate">${s.text}</span>
+                        <span class="text-[11px] ${textClass} truncate">${escapeHTML(s.text)}</span>
+                        ${dueBadge}
                     </div>
                     <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 flex-shrink-0 transition-opacity">
                         ${toggleHTML}
@@ -1066,13 +1472,25 @@
         document.getElementById('skill-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const textEl = document.getElementById('skill-text');
+            const dueEl = document.getElementById('skill-due-date');
             if (textEl.value.trim()) {
-                await setDoc(doc(skillsCol, Date.now().toString()), { text: textEl.value.trim(), type: 'milestone', status: document.getElementById('skill-status').value, createdAt: Date.now() });
+                await setDoc(doc(skillsCol, Date.now().toString()), { 
+                    text: textEl.value.trim(), 
+                    type: 'milestone', 
+                    status: document.getElementById('skill-status').value, 
+                    dueDate: dueEl.value || null,
+                    createdAt: Date.now() 
+                });
                 textEl.value = '';
+                dueEl.value = '';
             }
         });
-        window.markSkillDone = async (id) => { await setDoc(doc(db, 'skills', id), { status: 'done' }, { merge: true }); };
-        window.markSkillWip = async (id) => { await setDoc(doc(db, 'skills', id), { status: 'wip' }, { merge: true }); };
+        window.markSkillDone = async (id) => { 
+            await setDoc(doc(db, 'skills', id), { status: 'done', completedAt: Date.now() }, { merge: true }); 
+        };
+        window.markSkillWip = async (id) => { 
+            await setDoc(doc(db, 'skills', id), { status: 'wip', completedAt: null }, { merge: true }); 
+        };
         window.deleteSkill = async (id) => { await deleteDoc(doc(db, 'skills', id)); };
 
         // 4A-2: 🌱 习惯打卡
@@ -1093,7 +1511,7 @@
                 div.innerHTML = `
                     <div class="flex items-center gap-2 overflow-hidden">
                         <span class="text-xs">🌱</span>
-                        <span class="text-[11px] text-accent font-bold truncate">${p.text}</span>
+                        <span class="text-[11px] text-accent font-bold truncate">${escapeHTML(p.text)}</span>
                     </div>
                     <button onclick="window.markHabitPromptDone('${p.id}', '${p.text.replace(/'/g, "\\'")}')" class="text-accent border border-accent/30 hover:bg-accent hover:text-white px-2 py-1 rounded transition-colors text-[10px] font-bold shadow-sm whitespace-nowrap active:scale-95">✔︎ 划掉</button>
                 `;
@@ -1116,6 +1534,7 @@
             snapshot.forEach((doc) => currentHabits.push({ id: doc.id, ...doc.data() }));
             currentHabits.sort((a, b) => b.createdAt - a.createdAt);
             renderHabits();
+            renderCalendar();
         });
 
         function renderHabits() {
@@ -1131,7 +1550,7 @@
                 li.style.animationDelay = `${index * 0.05}s`;
                 li.innerHTML = `
                     <div class="flex justify-between items-start mb-1.5">
-                        <span class="text-[10px] font-bold text-ink bg-[#EAE5D9] px-1.5 py-0.5 rounded">${h.name}</span>
+                        <span class="text-[10px] font-bold text-ink bg-[#EAE5D9] px-1.5 py-0.5 rounded">${escapeHTML(h.name)}</span>
                         <div class="flex items-center gap-2">
                             <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${d.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})}</span>
                             <button onclick="window.deleteHabit('${h.id}')" class="text-inkLight hover:text-red-400 opacity-0 group-hover:opacity-100 transition-colors absolute right-2 top-2 active:scale-90">
@@ -1139,7 +1558,7 @@
                             </button>
                         </div>
                     </div>
-                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words">${h.content}</p>
+                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words">${escapeHTML(h.content)}</p>
                 `;
                 habitList.appendChild(li);
             });
@@ -1196,7 +1615,7 @@
 
                 li.innerHTML = `
                     <div class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-6 h-2.5 bg-[#D4CDBC]/30 rounded-full blur-[1px]"></div>
-                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words mt-1">${i.text}</p>
+                    <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words mt-1">${escapeHTML(i.text)}</p>
                     ${imgHTML}
                     <div class="flex justify-between items-center mt-2 pt-2 border-t border-borderLight/50">
                         <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日</span>
@@ -1221,6 +1640,430 @@
         });
         window.deleteInspire = async (id) => { await deleteDoc(doc(db, 'inspirations', id)); };
 
+        // ==========================================
+        // 模块 5：时光画卷 (全维度日历)
+        // ==========================================
+        const nowInit = new Date();
+        let calYear = nowInit.getFullYear();
+        let calMonth = nowInit.getMonth(); // 0-11
+        let selectedDateKey = toDateKey(nowInit);
+        let calFilter = 'all'; // 'all' | 'health' | 'exp' | 'left'
+
+        // 绑定月份切换按钮
+        document.getElementById('cal-prev').addEventListener('click', () => {
+            calMonth--;
+            if (calMonth < 0) { calMonth = 11; calYear--; }
+            renderCalendar();
+        });
+        document.getElementById('cal-next').addEventListener('click', () => {
+            calMonth++;
+            if (calMonth > 11) { calMonth = 0; calYear++; }
+            renderCalendar();
+        });
+        document.getElementById('cal-today').addEventListener('click', () => {
+            const today = new Date();
+            calYear = today.getFullYear();
+            calMonth = today.getMonth();
+            selectedDateKey = toDateKey(today);
+            renderCalendar();
+        });
+
+        // 绑定筛选按钮
+        document.querySelectorAll('.cal-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                calFilter = btn.getAttribute('data-cal-filter');
+                document.querySelectorAll('.cal-filter-btn').forEach(b => {
+                    b.className = 'cal-filter-btn px-2.5 py-1 text-[10px] font-bold rounded-md text-inkLight hover:text-ink transition-all active:scale-95';
+                });
+                btn.className = 'cal-filter-btn px-2.5 py-1 text-[10px] font-bold rounded-md bg-white shadow-sm text-ink transition-all active:scale-95';
+                renderCalendar();
+            });
+        });
+
+        // 汇总所有按日期分组的数据
+        function buildCalendarDataMap() {
+            const map = {};
+            const ensureDay = (key) => {
+                if (!map[key]) map[key] = { health: [], exp: [], leftDone: [], leftTodo: [] };
+                return map[key];
+            };
+
+            // 1. 运动记录
+            currentHealth.forEach(h => {
+                if (!h.createdAt) return;
+                ensureDay(toDateKey(h.createdAt)).health.push(h);
+            });
+
+            // 2. 生活拾光
+            currentExp.forEach(e => {
+                if (!e.createdAt) return;
+                ensureDay(toDateKey(e.createdAt)).exp.push(e);
+            });
+
+            // 3. 左脑习惯打卡 (归入左脑已做)
+            currentHabits.forEach(h => {
+                if (!h.createdAt) return;
+                ensureDay(toDateKey(h.createdAt)).leftDone.push({ kind: 'habit', ...h });
+            });
+
+            // 4. 左脑里程碑 (已做 & 待做)
+            currentSkills.forEach(s => {
+                if (s.status === 'done') {
+                    const doneTs = s.completedAt || s.createdAt;
+                    if (doneTs) {
+                        ensureDay(toDateKey(doneTs)).leftDone.push({ kind: 'milestone', ...s, effectiveCompletedAt: doneTs });
+                    }
+                } else if (s.dueDate) {
+                    ensureDay(s.dueDate).leftTodo.push(s);
+                }
+            });
+
+            return map;
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('cal-grid');
+            const monthLabel = document.getElementById('cal-month-label');
+            monthLabel.textContent = `${calYear}年${calMonth + 1}月`;
+
+            const dataMap = buildCalendarDataMap();
+            const todayKey = toDateKey(new Date());
+
+            // 计算当月第一天是星期几 (将周日0转为7，使周一为第一列)
+            const firstDayOfMonth = new Date(calYear, calMonth, 1);
+            let startWeekday = firstDayOfMonth.getDay();
+            startWeekday = startWeekday === 0 ? 7 : startWeekday;
+            const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+            grid.innerHTML = '';
+
+            // 补齐前置空白格
+            for (let i = 1; i < startWeekday; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'min-h-[52px] md:min-h-[60px] rounded-xl bg-transparent';
+                grid.appendChild(empty);
+            }
+
+            // 渲染每一天
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateKey = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayData = dataMap[dateKey] || { health: [], exp: [], leftDone: [], leftTodo: [] };
+
+                const showHealth = (calFilter === 'all' || calFilter === 'health') && dayData.health.length > 0;
+                const showExp = (calFilter === 'all' || calFilter === 'exp') && dayData.exp.length > 0;
+                const showLeftDone = (calFilter === 'all' || calFilter === 'left') && dayData.leftDone.length > 0;
+                const showLeftTodo = (calFilter === 'all' || calFilter === 'left') && dayData.leftTodo.length > 0;
+
+                const isToday = dateKey === todayKey;
+                const isSelected = dateKey === selectedDateKey;
+
+                let cellClass = 'cal-cell cursor-pointer min-h-[52px] md:min-h-[60px] rounded-xl p-1.5 flex flex-col justify-between items-center border ';
+                if (isSelected) {
+                    cellClass += 'bg-white border-accent shadow-soft ring-1 ring-accent/30';
+                } else if (isToday) {
+                    cellClass += 'bg-accent/10 border-accent/40 hover:bg-white';
+                } else {
+                    cellClass += 'bg-[#FAF9F5]/80 border-borderLight/70 hover:bg-white hover:border-[#D4CDBC]';
+                }
+
+                let dotsHTML = '';
+                if (showHealth) dotsHTML += `<span class="w-1.5 h-1.5 rounded-full bg-[#E29578]" title="运动"></span>`;
+                if (showExp) dotsHTML += `<span class="w-1.5 h-1.5 rounded-full bg-[#D4A373]" title="拾光"></span>`;
+                if (showLeftDone) dotsHTML += `<span class="w-1.5 h-1.5 rounded-full bg-[#839788]" title="左脑已做"></span>`;
+                if (showLeftTodo) dotsHTML += `<span class="w-1.5 h-1.5 rounded-full border-[1.5px] border-[#4A443B]" title="左脑待做"></span>`;
+
+                const cell = document.createElement('button');
+                cell.type = 'button';
+                cell.className = cellClass;
+                cell.innerHTML = `
+                    <span class="text-xs font-bold ${isToday ? 'text-accent' : (isSelected ? 'text-ink' : 'text-ink/80')}">${day}</span>
+                    <div class="flex items-center justify-center gap-1 flex-wrap min-h-[8px]">${dotsHTML}</div>
+                `;
+                cell.addEventListener('click', () => {
+                    selectedDateKey = dateKey;
+                    renderCalendar();
+                });
+                grid.appendChild(cell);
+            }
+
+            renderCalendarDetail(dataMap[selectedDateKey] || { health: [], exp: [], leftDone: [], leftTodo: [] });
+        }
+
+        function renderCalendarDetail(dayData) {
+            const parts = selectedDateKey.split('-');
+            const dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+
+            document.getElementById('cal-detail-date').textContent = `${parseInt(parts[0])}年${parseInt(parts[1])}月${parseInt(parts[2])}日`;
+            document.getElementById('cal-detail-weekday').textContent = weekdays[dateObj.getDay()];
+
+            const showHealth = (calFilter === 'all' || calFilter === 'health') ? dayData.health : [];
+            const showExp = (calFilter === 'all' || calFilter === 'exp') ? dayData.exp : [];
+            const showLeftDone = (calFilter === 'all' || calFilter === 'left') ? dayData.leftDone : [];
+            const showLeftTodo = (calFilter === 'all' || calFilter === 'left') ? dayData.leftTodo : [];
+
+            const totalCount = showHealth.length + showExp.length + showLeftDone.length + showLeftTodo.length;
+            document.getElementById('cal-detail-count').textContent = `${totalCount} 条记录`;
+
+            const body = document.getElementById('cal-detail-body');
+            body.innerHTML = '';
+
+            if (totalCount === 0) {
+                body.innerHTML = `
+                    <div class="h-48 flex flex-col items-center justify-center text-center px-4">
+                        <p class="text-xs text-inkLight/60 font-serif italic">这一天风轻云淡，暂无记录。</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 1. 运动记录
+            if (showHealth.length > 0) {
+                const sec = document.createElement('div');
+                sec.className = 'space-y-2 list-enter';
+                sec.innerHTML = `<p class="text-[10px] font-bold text-[#E29578] uppercase tracking-wider flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#E29578]"></span>运动与能量 (${showHealth.length})</p>`;
+                showHealth.forEach(h => {
+                    const card = document.createElement('div');
+                    card.className = 'p-2.5 rounded-xl bg-[#FAF9F5] border border-borderLight flex justify-between items-center';
+                    card.innerHTML = `
+                        <div>
+                            <span class="text-[11.5px] font-bold text-ink">${escapeHTML(h.activity)}</span>
+                            <span class="text-[10.5px] text-inkLight ml-1.5">${escapeHTML(h.duration)}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E29578]/10 text-[#E29578]">${escapeHTML(h.state)}</span>
+                            <span class="text-[9px] text-inkLight">${formatTimeHM(h.createdAt)}</span>
+                        </div>
+                    `;
+                    sec.appendChild(card);
+                });
+                body.appendChild(sec);
+            }
+
+            // 2. 生活拾光
+            if (showExp.length > 0) {
+                const sec = document.createElement('div');
+                sec.className = 'space-y-2 list-enter';
+                sec.innerHTML = `<p class="text-[10px] font-bold text-[#D4A373] uppercase tracking-wider flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#D4A373]"></span>生活拾光 (${showExp.length})</p>`;
+                showExp.forEach(e => {
+                    const card = document.createElement('div');
+                    card.className = 'p-3 rounded-xl bg-[#FAF9F5] border border-borderLight space-y-1.5';
+                    const imgHTML = e.image ? `<img src="${e.image}" class="w-full h-28 object-cover rounded-lg border border-borderLight" alt="拾光图片">` : '';
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-accent/10 text-accent">${escapeHTML(e.tag)}</span>
+                            <span class="text-[9px] text-inkLight">${formatTimeHM(e.createdAt)}</span>
+                        </div>
+                        ${imgHTML}
+                        <p class="text-[11.5px] text-ink leading-relaxed font-medium break-words">${escapeHTML(e.text)}</p>
+                    `;
+                    sec.appendChild(card);
+                });
+                body.appendChild(sec);
+            }
+
+            // 3. 左脑已做 (习惯打卡 + 已完成里程碑)
+            if (showLeftDone.length > 0) {
+                const sec = document.createElement('div');
+                sec.className = 'space-y-2 list-enter';
+                sec.innerHTML = `<p class="text-[10px] font-bold text-[#839788] uppercase tracking-wider flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#839788]"></span>左脑已做 (${showLeftDone.length})</p>`;
+                
+                showLeftDone.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'p-2.5 rounded-xl bg-[#FAF9F5] border border-borderLight space-y-1.5';
+                    
+                    if (item.kind === 'habit') {
+                        card.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] font-bold text-ink bg-[#EAE5D9] px-1.5 py-0.5 rounded">${escapeHTML(item.name)}</span>
+                                <span class="text-[9px] text-inkLight">${formatTimeHM(item.createdAt)} 打卡</span>
+                            </div>
+                            <p class="text-[11.5px] text-ink font-medium break-words">${escapeHTML(item.content)}</p>
+                        `;
+                    } else {
+                        // 里程碑已完成：判断耗时是否超过24小时
+                        const doneTs = item.effectiveCompletedAt;
+                        const createdTs = item.createdAt || doneTs;
+                        const diffMs = doneTs - createdTs;
+                        const over24h = diffMs > 24 * 60 * 60 * 1000;
+                        const isSameDay = toDateKey(createdTs) === toDateKey(doneTs);
+                        const shouldShowDuration = (over24h && !isSameDay) || Boolean(item.customDuration);
+                        const durationDisplay = item.customDuration || formatDurationText(diffMs);
+
+                        let durationHTML = '';
+                        if (shouldShowDuration) {
+                            durationHTML = `
+                                <div class="flex items-center justify-between pt-1.5 mt-1 border-t border-borderLight/60">
+                                    <div id="dur-display-${item.id}" class="flex items-center gap-1.5">
+                                        <span class="text-[10px] text-[#839788] bg-[#839788]/10 px-1.5 py-0.5 rounded font-bold">⏱ 耗时：${escapeHTML(durationDisplay)}</span>
+                                        <button type="button" onclick="window.toggleEditDuration('${item.id}')" class="text-[10px] text-inkLight hover:text-accent transition-colors" title="人工修改耗时">✏️ 修改</button>
+                                    </div>
+                                    <form id="dur-form-${item.id}" class="hidden flex items-center gap-1.5 w-full" onsubmit="window.saveSkillDuration(event, '${item.id}')">
+                                        <input type="text" id="dur-input-${item.id}" value="${escapeHTML(durationDisplay)}" placeholder="如: 3天 / 5小时" class="flex-1 input-paper rounded px-2 py-0.5 text-[10px] text-ink focus:outline-none" required>
+                                        <button type="submit" class="bg-[#839788] text-white px-2 py-0.5 rounded text-[10px] font-bold active:scale-95">保存</button>
+                                        <button type="button" onclick="window.toggleEditDuration('${item.id}')" class="text-[10px] text-inkLight hover:text-ink px-1">取消</button>
+                                    </form>
+                                </div>
+                            `;
+                        }
+
+                        card.innerHTML = `
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-[10px] font-bold bg-[#839788] text-white px-1.5 py-0.5 rounded flex-shrink-0">🎯 里程碑</span>
+                                <span class="text-[9px] text-inkLight">${formatTimeHM(doneTs)} 完成</span>
+                            </div>
+                            <p class="text-[11.5px] text-ink font-bold break-words">${escapeHTML(item.text)}</p>
+                            ${durationHTML}
+                        `;
+                    }
+                    sec.appendChild(card);
+                });
+                body.appendChild(sec);
+            }
+
+            // 4. 左脑待做 (设置了计划日期的未完成里程碑)
+            if (showLeftTodo.length > 0) {
+                const sec = document.createElement('div');
+                sec.className = 'space-y-2 list-enter';
+                sec.innerHTML = `<p class="text-[10px] font-bold text-ink uppercase tracking-wider flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full border-[1.5px] border-ink"></span>左脑待做 (${showLeftTodo.length})</p>`;
+                showLeftTodo.forEach(t => {
+                    const isWip = t.status === 'wip';
+                    const card = document.createElement('div');
+                    card.className = 'p-2.5 rounded-xl bg-white border border-dashed border-borderLight flex justify-between items-center gap-2';
+                    card.innerHTML = `
+                        <div class="flex items-center gap-1.5 overflow-hidden">
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${isWip ? 'bg-[#839788]/15 text-[#839788]' : 'bg-[#EAE5D9] text-inkLight'} flex-shrink-0">${isWip ? '⏳ 专注' : '📦 抽屉'}</span>
+                            <span class="text-[11.5px] text-ink font-medium truncate">${escapeHTML(t.text)}</span>
+                        </div>
+                        <button type="button" onclick="window.markSkillDone('${t.id}')" class="text-[10px] font-bold text-[#839788] border border-[#839788]/30 hover:bg-[#839788] hover:text-white px-2 py-0.5 rounded transition-all flex-shrink-0 active:scale-95">✔︎ 完成</button>
+                    `;
+                    sec.appendChild(card);
+                });
+                body.appendChild(sec);
+            }
+        }
+
+        // 耗时人工修改交互
+        window.toggleEditDuration = (id) => {
+            const displayEl = document.getElementById(`dur-display-${id}`);
+            const formEl = document.getElementById(`dur-form-${id}`);
+            if (!displayEl || !formEl) return;
+            displayEl.classList.toggle('hidden');
+            formEl.classList.toggle('hidden');
+        };
+
+        window.saveSkillDuration = async (e, id) => {
+            e.preventDefault();
+            const val = document.getElementById(`dur-input-${id}`).value.trim();
+            if (val) {
+                await setDoc(doc(db, 'skills', id), { customDuration: val }, { merge: true });
+            }
+        };
+
+        // ==========================================
+        // 双视角切换与财富金库口令 (0726)
+        // ==========================================
+        const VAULT_PASSCODE = '0726';
+        let isVaultUnlocked = false;
+
+        const switchDailyBtn = document.getElementById('switch-daily');
+        const switchVaultBtn = document.getElementById('switch-vault');
+        const viewDaily = document.getElementById('view-daily');
+        const viewVault = document.getElementById('view-vault');
+        const vaultLockIcon = document.getElementById('vault-lock-icon');
+        const lockVaultBtn = document.getElementById('lock-vault-btn');
+
+        const passcodeModal = document.getElementById('vault-passcode-modal');
+        const passcodeCard = document.getElementById('vault-passcode-card');
+        const passcodeForm = document.getElementById('vault-passcode-form');
+        const passcodeInput = document.getElementById('vault-passcode-input');
+        const passcodeError = document.getElementById('vault-passcode-error');
+        const passcodeCancel = document.getElementById('vault-passcode-cancel');
+
+        function activateDailyView() {
+            viewDaily.classList.remove('hidden');
+            viewVault.classList.add('hidden');
+            switchDailyBtn.className = 'px-3.5 py-1.5 text-[11px] font-bold rounded-lg bg-white shadow-sm text-ink transition-all active:scale-95 flex items-center gap-1.5';
+            switchVaultBtn.className = 'px-3.5 py-1.5 text-[11px] font-bold rounded-lg text-inkLight hover:text-ink transition-all active:scale-95 flex items-center gap-1.5';
+        }
+
+        function activateVaultView() {
+            viewDaily.classList.add('hidden');
+            viewVault.classList.remove('hidden');
+            vaultLockIcon.textContent = '🔓';
+            switchVaultBtn.className = 'px-3.5 py-1.5 text-[11px] font-bold rounded-lg bg-white shadow-sm text-ink transition-all active:scale-95 flex items-center gap-1.5';
+            switchDailyBtn.className = 'px-3.5 py-1.5 text-[11px] font-bold rounded-lg text-inkLight hover:text-ink transition-all active:scale-95 flex items-center gap-1.5';
+        }
+
+        function openPasscodeModal() {
+            passcodeInput.value = '';
+            passcodeError.classList.add('opacity-0');
+            passcodeModal.classList.remove('hidden');
+            passcodeModal.classList.add('flex');
+            setTimeout(() => passcodeInput.focus(), 50);
+        }
+
+        function closePasscodeModal() {
+            passcodeModal.classList.add('hidden');
+            passcodeModal.classList.remove('flex');
+            passcodeInput.value = '';
+        }
+
+        function verifyPasscode() {
+            if (passcodeInput.value.trim() === VAULT_PASSCODE) {
+                isVaultUnlocked = true;
+                closePasscodeModal();
+                activateVaultView();
+            } else {
+                passcodeError.classList.remove('opacity-0');
+                passcodeCard.classList.remove('animate-shake');
+                void passcodeCard.offsetWidth; // 触发重绘以重播抖动动画
+                passcodeCard.classList.add('animate-shake');
+                passcodeInput.value = '';
+                passcodeInput.focus();
+            }
+        }
+
+        switchDailyBtn.addEventListener('click', activateDailyView);
+        switchVaultBtn.addEventListener('click', () => {
+            if (isVaultUnlocked) {
+                activateVaultView();
+            } else {
+                openPasscodeModal();
+            }
+        });
+
+        lockVaultBtn.addEventListener('click', () => {
+            isVaultUnlocked = false;
+            vaultLockIcon.textContent = '🔒';
+            activateDailyView();
+        });
+
+        passcodeCancel.addEventListener('click', closePasscodeModal);
+        passcodeModal.addEventListener('click', (e) => {
+            if (e.target === passcodeModal) closePasscodeModal();
+        });
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !passcodeModal.classList.contains('hidden')) {
+                closePasscodeModal();
+            }
+        });
+
+        passcodeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            verifyPasscode();
+        });
+
+        // 输满 4 位自动校验，手机端体验更顺滑
+        passcodeInput.addEventListener('input', () => {
+            passcodeError.classList.add('opacity-0');
+            if (passcodeInput.value.length === 4) {
+                verifyPasscode();
+            }
+        });
+
+        // 初始渲染一次日历骨架
+        renderCalendar();
     </script>
 </body>
 </html>
