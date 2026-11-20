@@ -106,14 +106,9 @@
             transform: translateY(0);
         }
 
-        /* 动画：交错列表加载 */
-        @keyframes springUp {
-            0% { opacity: 0; transform: translateY(15px) scale(0.98); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
+        /* 列表无闪烁平滑渲染 */
         .list-enter {
-            animation: springUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
-            opacity: 0;
+            opacity: 1;
         }
 
         /* 动态交互流体光晕 */
@@ -822,6 +817,7 @@
         }
 
         let isSyncing = false;
+        let lastCloudSnapshot = null;
         async function syncAllFromCloud(silent = false) {
             if (isSyncing) return;
             isSyncing = true;
@@ -834,18 +830,22 @@
                 });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const rows = await res.json();
+                const currentSnapshot = JSON.stringify(rows);
 
-                // 清空并重建内存缓存
-                Object.keys(cloudStore).forEach(k => delete cloudStore[k]);
-                rows.forEach(row => {
-                    const col = row.col;
-                    const prefix = `${col}__`;
-                    const docId = row.id.startsWith(prefix) ? row.id.slice(prefix.length) : row.id;
-                    if (!cloudStore[col]) cloudStore[col] = {};
-                    cloudStore[col][docId] = row.data || {};
-                });
+                if (currentSnapshot !== lastCloudSnapshot) {
+                    lastCloudSnapshot = currentSnapshot;
+                    // 清空并重建内存缓存
+                    Object.keys(cloudStore).forEach(k => delete cloudStore[k]);
+                    rows.forEach(row => {
+                        const col = row.col;
+                        const prefix = `${col}__`;
+                        const docId = row.id.startsWith(prefix) ? row.id.slice(prefix.length) : row.id;
+                        if (!cloudStore[col]) cloudStore[col] = {};
+                        cloudStore[col][docId] = row.data || {};
+                    });
+                    notifyAll();
+                }
 
-                notifyAll();
                 const nowStr = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
                 setSyncStatus('ok', `已同步 ${nowStr}`);
             } catch (err) {
@@ -880,6 +880,7 @@
                     body: JSON.stringify(payload)
                 });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                lastCloudSnapshot = null;
                 const nowStr = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
                 setSyncStatus('ok', `已同步 ${nowStr}`);
             } catch (err) {
