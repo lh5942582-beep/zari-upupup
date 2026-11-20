@@ -165,8 +165,12 @@
 
     <div class="max-w-7xl mx-auto space-y-5 relative z-10 pb-8">
 
-        <!-- 顶栏：极简双视角切换器 (日常空间 / 财富金库) -->
-        <div class="flex justify-end">
+        <!-- 顶栏：云端同步状态 + 极简双视角切换器 (日常空间 / 财富金库) -->
+        <div class="flex justify-between items-center gap-3">
+            <button id="sync-status-btn" type="button" title="点击立即从云端同步" class="inline-flex items-center gap-1.5 bg-[#FDFCF9]/75 backdrop-blur-md px-3 py-1.5 rounded-xl border border-borderLight shadow-soft text-[10px] font-bold text-inkLight hover:text-ink transition-all active:scale-95">
+                <span id="sync-dot" class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                <span id="sync-text">连接云端中...</span>
+            </button>
             <div class="inline-flex items-center bg-[#FDFCF9]/75 backdrop-blur-md p-1 rounded-xl border border-borderLight shadow-soft">
                 <button id="switch-daily" type="button" class="px-3.5 py-1.5 text-[11px] font-bold rounded-lg bg-white shadow-sm text-ink transition-all active:scale-95 flex items-center gap-1.5">
                     <span>✨</span> 日常空间
@@ -726,22 +730,195 @@
         </div>
     </div>
 
-    <!-- Firebase 云端逻辑 -->
+    <!-- Supabase 云端直连逻辑 (免代理跨端实时同步) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        const SUPABASE_URL = "https://xmsevvcjouvuaizgttgr.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_cgGwQanUKZ-in3Yn0BLpBA_WbaclIos";
+        const TABLE_NAME = "zari_data";
+        const REST_ENDPOINT = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAbEEIj-K8q4g_7_dT8wqKAB4LCVB0i9E8",
-            authDomain: "zariworkspace-60e41.firebaseapp.com",
-            projectId: "zariworkspace-60e41",
-            storageBucket: "zariworkspace-60e41.firebasestorage.app",
-            messagingSenderId: "606082337084",
-            appId: "1:606082337084:web:d1eb4f86698ef46c6df639"
-        };
+        function getSupabaseHeaders(extra = {}) {
+            const headers = {
+                'apikey': SUPABASE_KEY,
+                'Content-Type': 'application/json',
+                ...extra
+            };
+            if (SUPABASE_KEY.startsWith('eyJ')) {
+                headers['Authorization'] = `Bearer ${SUPABASE_KEY}`;
+            }
+            return headers;
+        }
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        // 状态指示灯控制
+        const syncDot = document.getElementById('sync-dot');
+        const syncText = document.getElementById('sync-text');
+        const syncBtn = document.getElementById('sync-status-btn');
+
+        function setSyncStatus(state, msg) {
+            if (!syncDot || !syncText) return;
+            if (state === 'ok') {
+                syncDot.className = 'w-2 h-2 rounded-full bg-[#839788]';
+                syncText.textContent = msg || '云端已同步';
+            } else if (state === 'loading') {
+                syncDot.className = 'w-2 h-2 rounded-full bg-accent animate-pulse';
+                syncText.textContent = msg || '同步中...';
+            } else {
+                syncDot.className = 'w-2 h-2 rounded-full bg-[#E29578]';
+                syncText.textContent = msg || '同步异常，点此重试';
+            }
+        }
+
+        // 本地内存缓存与订阅器 (兼容原数据调用接口)
+        const db = { _provider: 'supabase' };
+        const cloudStore = {};
+        const listeners = [];
+
+        function collection(_db, colName) {
+            return { _type: 'col', col: colName };
+        }
+
+        function doc(first, second, third) {
+            if (first && first._type === 'col') {
+                return { _type: 'doc', col: first.col, id: String(second) };
+            }
+            return { _type: 'doc', col: String(second), id: String(third) };
+        }
+
+        function notifyCol(colName) {
+            listeners.forEach(item => {
+                if (item.ref.col !== colName) return;
+                if (item.ref._type === 'col') {
+                    const docsMap = cloudStore[colName] || {};
+                    const entries = Object.entries(docsMap).map(([id, data]) => ({
+                        id,
+                        data: () => ({ ...data })
+                    }));
+                    item.cb({ forEach: (fn) => entries.forEach(fn) });
+                } else if (item.ref._type === 'doc') {
+                    const docData = cloudStore[colName]?.[item.ref.id];
+                    item.cb({
+                        exists: () => docData !== undefined,
+                        data: () => (docData ? { ...docData } : undefined)
+                    });
+                }
+            });
+        }
+
+        function notifyAll() {
+            const cols = new Set(listeners.map(l => l.ref.col));
+            cols.forEach(c => notifyCol(c));
+        }
+
+        function onSnapshot(ref, cb) {
+            listeners.push({ ref, cb });
+            // 若已有数据则立即渲染
+            if (Object.keys(cloudStore).length > 0) {
+                notifyCol(ref.col);
+            }
+        }
+
+        let isSyncing = false;
+        async function syncAllFromCloud(silent = false) {
+            if (isSyncing) return;
+            isSyncing = true;
+            if (!silent) setSyncStatus('loading', '同步中...');
+            try {
+                const res = await fetch(`${REST_ENDPOINT}?select=*&order=created_at.desc`, {
+                    method: 'GET',
+                    headers: getSupabaseHeaders(),
+                    cache: 'no-store'
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const rows = await res.json();
+
+                // 清空并重建内存缓存
+                Object.keys(cloudStore).forEach(k => delete cloudStore[k]);
+                rows.forEach(row => {
+                    const col = row.col;
+                    const prefix = `${col}__`;
+                    const docId = row.id.startsWith(prefix) ? row.id.slice(prefix.length) : row.id;
+                    if (!cloudStore[col]) cloudStore[col] = {};
+                    cloudStore[col][docId] = row.data || {};
+                });
+
+                notifyAll();
+                const nowStr = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                setSyncStatus('ok', `已同步 ${nowStr}`);
+            } catch (err) {
+                console.error('Supabase sync error:', err);
+                setSyncStatus('error', '同步失败，点此重试');
+            } finally {
+                isSyncing = false;
+            }
+        }
+
+        async function setDoc(docRef, data, options = {}) {
+            const { col, id } = docRef;
+            if (!cloudStore[col]) cloudStore[col] = {};
+            const merged = options && options.merge
+                ? { ...(cloudStore[col][id] || {}), ...data }
+                : { ...data };
+            cloudStore[col][id] = merged;
+            notifyCol(col);
+
+            setSyncStatus('loading', '保存中...');
+            try {
+                const rowId = `${col}__${id}`;
+                const payload = {
+                    id: rowId,
+                    col: col,
+                    data: merged,
+                    created_at: Number(merged.createdAt) || Date.now()
+                };
+                const res = await fetch(REST_ENDPOINT, {
+                    method: 'POST',
+                    headers: getSupabaseHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const nowStr = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                setSyncStatus('ok', `已同步 ${nowStr}`);
+            } catch (err) {
+                console.error('Supabase save error:', err);
+                setSyncStatus('error', '保存失败，请重试');
+                alert('云端保存失败，请检查网络连接后重试。');
+            }
+        }
+
+        async function deleteDoc(docRef) {
+            const { col, id } = docRef;
+            if (cloudStore[col]) {
+                delete cloudStore[col][id];
+                notifyCol(col);
+            }
+
+            setSyncStatus('loading', '同步删除...');
+            try {
+                const rowId = `${col}__${id}`;
+                const res = await fetch(`${REST_ENDPOINT}?id=eq.${encodeURIComponent(rowId)}`, {
+                    method: 'DELETE',
+                    headers: getSupabaseHeaders()
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const nowStr = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                setSyncStatus('ok', `已同步 ${nowStr}`);
+            } catch (err) {
+                console.error('Supabase delete error:', err);
+                setSyncStatus('error', '删除同步失败');
+            }
+        }
+
+        if (syncBtn) {
+            syncBtn.addEventListener('click', () => syncAllFromCloud(false));
+        }
+        // 页面切回前台或每 30 秒自动静默拉取最新数据，保持手机电脑一致
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') syncAllFromCloud(true);
+        });
+        window.addEventListener('focus', () => syncAllFromCloud(true));
+        setInterval(() => {
+            if (document.visibilityState === 'visible') syncAllFromCloud(true);
+        }, 30000);
 
         // --- 工具函数 ---
         function toDateKey(dateOrTs) {
@@ -2062,8 +2239,9 @@
             }
         });
 
-        // 初始渲染一次日历骨架
+        // 初始渲染一次日历骨架并拉取云端全部数据
         renderCalendar();
+        syncAllFromCloud(false);
     </script>
 </body>
 </html>
