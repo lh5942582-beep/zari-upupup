@@ -300,7 +300,7 @@
                     </div>
                 </div>
 
-                <form id="health-form" class="space-y-2.5 mb-4 flex-shrink-0">
+                <form id="health-form" class="space-y-2 mb-4 flex-shrink-0">
                     <div class="flex gap-2">
                         <select id="health-activity" class="w-[45%] input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none">
                             <option value="功能性训练">功能训练</option>
@@ -311,6 +311,10 @@
                             <option value="纯休息">纯休息</option>
                         </select>
                         <input type="text" id="health-duration" placeholder="时长或组数" class="w-[55%] input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none" required>
+                    </div>
+                    <div class="flex items-center gap-1.5 input-paper rounded-lg px-2.5 py-1.5">
+                        <span class="text-[10px] text-inkLight whitespace-nowrap">📅 运动日期</span>
+                        <input type="date" id="health-date" class="flex-1 bg-transparent text-[11px] text-ink focus:outline-none cursor-pointer" required>
                     </div>
                     <div class="flex gap-2">
                         <select id="health-state" class="flex-1 input-paper rounded-lg px-2 py-1.5 text-[11px] text-ink focus:outline-none">
@@ -1385,12 +1389,33 @@
         window.deleteWealth = async (id) => { await deleteDoc(doc(db, 'wealth', id)); };
 
         // --- 2. 身体 ---
+        const healthDateInput = document.getElementById('health-date');
+        if (healthDateInput) {
+            healthDateInput.value = toDateKey(new Date());
+        }
+
+        function getHealthDateKey(h) {
+            if (h.date) return h.date;
+            if (h.createdAt) return toDateKey(h.createdAt);
+            return toDateKey(new Date());
+        }
+
+        function formatDateKeyCN(dateKey) {
+            const parts = String(dateKey).split('-');
+            if (parts.length !== 3) return dateKey;
+            return `${parseInt(parts[0])}年${parseInt(parts[1])}月${parseInt(parts[2])}日`;
+        }
+
         const healthCol = collection(db, 'health');
         let currentHealth = [];
         onSnapshot(healthCol, (snapshot) => {
             currentHealth = [];
             snapshot.forEach((doc) => currentHealth.push({ id: doc.id, ...doc.data() }));
-            currentHealth.sort((a, b) => b.createdAt - a.createdAt);
+            currentHealth.sort((a, b) => {
+                const keyCmp = getHealthDateKey(b).localeCompare(getHealthDateKey(a));
+                if (keyCmp !== 0) return keyCmp;
+                return (b.createdAt || 0) - (a.createdAt || 0);
+            });
             renderHealth();
             renderCalendar();
         });
@@ -1398,22 +1423,29 @@
             const healthList = document.getElementById('health-list');
             healthList.innerHTML = '';
             let weeklyCount = 0;
-            const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-            currentHealth.forEach(h => { if (h.createdAt > sevenDaysAgo && h.activity !== '纯休息') weeklyCount++; });
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            const sevenDaysAgoMs = todayStart.getTime() - 6 * 24 * 60 * 60 * 1000;
+            currentHealth.forEach(h => {
+                if (h.activity === '纯休息') return;
+                const hKey = getHealthDateKey(h);
+                const hTime = new Date(hKey + 'T00:00:00').getTime();
+                if (hTime >= sevenDaysAgoMs && hTime <= todayStart.getTime()) weeklyCount++;
+            });
             document.getElementById('health-weekly-count').textContent = weeklyCount;
             document.getElementById('health-current-state').textContent = currentHealth.length > 0 ? currentHealth[0].state.replace(/[^一-龥]/g, '') : '暂无反馈';
             if (currentHealth.length === 0) return;
             const stateColors = { '精力充沛': 'text-[#839788] bg-[#839788]/10', '状态平稳': 'text-accent bg-accent/10', '急需回血': 'text-[#E29578] bg-[#E29578]/10', '肌肉酸痛': 'text-inkLight bg-[#EAE5D9]' };
             currentHealth.forEach((h, index) => {
                 const colorClass = stateColors[h.state.replace(/[^一-龥]/g, '')] || 'text-ink bg-borderLight';
-                const d = new Date(h.createdAt);
+                const dateLabel = formatDateKeyCN(getHealthDateKey(h));
                 const li = document.createElement('li');
                 li.className = `group flex items-center justify-between p-2.5 rounded-lg bg-[#FAF9F5] border border-borderLight hover:border-[#D4CDBC] transition-all duration-300 list-enter`;
                 li.style.animationDelay = `${index * 0.05}s`;
                 li.innerHTML = `
                     <div class="flex flex-col gap-0.5 overflow-hidden w-2/3">
                         <div class="flex items-center gap-1.5"><span class="text-[11px] text-ink font-bold truncate">${escapeHTML(h.activity)}</span><span class="text-[10px] text-inkLight/80 font-medium">${escapeHTML(h.duration)}</span></div>
-                        <span class="text-[9px] text-inkLight">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${d.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'})}</span>
+                        <span class="text-[9px] text-inkLight">${dateLabel}</span>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${colorClass}">${escapeHTML(h.state)}</span>
@@ -1426,9 +1458,17 @@
         document.getElementById('health-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const duration = document.getElementById('health-duration');
+            const selectedDate = (healthDateInput && healthDateInput.value) ? healthDateInput.value : toDateKey(new Date());
             if (duration.value.trim()) {
-                await setDoc(doc(healthCol, Date.now().toString()), { activity: document.getElementById('health-activity').value, duration: duration.value.trim(), state: document.getElementById('health-state').value, createdAt: Date.now() });
+                await setDoc(doc(healthCol, Date.now().toString()), {
+                    activity: document.getElementById('health-activity').value,
+                    duration: duration.value.trim(),
+                    state: document.getElementById('health-state').value,
+                    date: selectedDate,
+                    createdAt: Date.now()
+                });
                 duration.value = '';
+                if (healthDateInput) healthDateInput.value = toDateKey(new Date());
             }
         });
         window.deleteHealth = async (id) => { await deleteDoc(doc(db, 'health', id)); };
@@ -1867,8 +1907,9 @@
 
             // 1. 运动记录
             currentHealth.forEach(h => {
-                if (!h.createdAt) return;
-                ensureDay(toDateKey(h.createdAt)).health.push(h);
+                const hKey = getHealthDateKey(h);
+                if (!hKey) return;
+                ensureDay(hKey).health.push(h);
             });
 
             // 2. 生活拾光
@@ -2009,7 +2050,6 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E29578]/10 text-[#E29578]">${escapeHTML(h.state)}</span>
-                            <span class="text-[9px] text-inkLight">${formatTimeHM(h.createdAt)}</span>
                         </div>
                     `;
                     sec.appendChild(card);
