@@ -148,6 +148,23 @@
         .animate-shake {
             animation: shakeX 0.35s ease-in-out;
         }
+
+        /* AI 副脑右侧玻璃抽屉 */
+        #ai-drawer-panel {
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #ai-drawer-overlay.open #ai-drawer-panel {
+            transform: translateX(0);
+        }
+        .ai-md p { margin-bottom: 0.5rem; }
+        .ai-md p:last-child { margin-bottom: 0; }
+        .ai-md ul, .ai-md ol { margin: 0.4rem 0 0.5rem 1.1rem; }
+        .ai-md ul { list-style-type: disc; }
+        .ai-md ol { list-style-type: decimal; }
+        .ai-md li { margin-bottom: 0.25rem; }
+        .ai-md strong { color: #4A443B; font-weight: 700; }
+        .ai-md h3, .ai-md h4 { font-weight: 700; color: #4A443B; margin-top: 0.65rem; margin-bottom: 0.3rem; }
     </style>
 </head>
 <body class="font-sans min-h-screen p-4 md:p-8 selection:bg-accent selection:text-white relative overflow-x-hidden">
@@ -166,33 +183,76 @@
                 <span id="sync-dot" class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
                 <span id="sync-text">连接云端中...</span>
             </button>
-            <div class="inline-flex items-center bg-[#FDFCF9]/75 backdrop-blur-md p-1 rounded-xl border border-borderLight shadow-soft">
-                <button id="switch-daily" type="button" class="px-3.5 py-1.5 text-[11px] font-bold rounded-lg bg-white shadow-sm text-ink transition-all active:scale-95 flex items-center gap-1.5">
-                    <span>✨</span> 日常空间
+            <div class="flex items-center gap-2 flex-wrap justify-end">
+                <button id="open-ai-drawer-btn" type="button" class="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#FDFCF9]/90 to-[#FAF5EC]/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-accent/40 hover:border-accent shadow-soft hover:shadow-glow text-[11px] font-bold text-ink transition-all active:scale-95">
+                    <span class="text-accent">✦</span>
+                    <span>AI 副脑</span>
                 </button>
-                <button id="switch-vault" type="button" class="px-3.5 py-1.5 text-[11px] font-bold rounded-lg text-inkLight hover:text-ink transition-all active:scale-95 flex items-center gap-1.5">
-                    <span id="vault-lock-icon">🔒</span> 财富金库
-                </button>
+                <div class="inline-flex items-center bg-[#FDFCF9]/75 backdrop-blur-md p-1 rounded-xl border border-borderLight shadow-soft">
+                    <button id="switch-daily" type="button" class="px-3.5 py-1.5 text-[11px] font-bold rounded-lg bg-white shadow-sm text-ink transition-all active:scale-95 flex items-center gap-1.5">
+                        <span>✨</span> 日常空间
+                    </button>
+                    <button id="switch-vault" type="button" class="px-3.5 py-1.5 text-[11px] font-bold rounded-lg text-inkLight hover:text-ink transition-all active:scale-95 flex items-center gap-1.5">
+                        <span id="vault-lock-icon">🔒</span> 财富金库
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- ==================== 视角一：日常空间 ==================== -->
         <div id="view-daily" class="space-y-6">
         
-        <!-- 一、 全局穹顶：人生北极星 (🪞观自己) -->
-        <header class="oil-panel rounded-2xl p-6 relative overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-lg" onclick="toggleVision(event)">
-            <div class="relative z-10 flex justify-between items-start">
-                <div>
-                    <p class="text-[10px] font-bold text-accent uppercase tracking-widest mb-2 flex items-center gap-1.5 opacity-80">
+        <!-- 一、 全局穹顶：人生北极星 & AI 每日头版 (🪞观自己) -->
+        <header class="oil-panel rounded-2xl p-5 md:p-6 relative overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-lg" onclick="toggleVision(event)">
+            <!-- 顶行眉标：缩小后的 Slogan + 周期复盘入口 + 展开箭头 -->
+            <div class="relative z-10 flex flex-wrap justify-between items-center gap-2 mb-3.5">
+                <div class="flex flex-wrap items-center gap-2 text-[10px] font-bold tracking-wider">
+                    <span class="text-accent uppercase flex items-center gap-1 opacity-90">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
                         zari's Digital Brain
-                    </p>
-                    <h1 class="text-2xl font-bold text-ink mb-1 tracking-tight">总结自己、剖析自己、超越自己</h1>
-                    <p class="text-sm text-inkLight font-serif italic">“创造极致的视觉体验，掌控自己的人生节奏。”</p>
+                    </span>
+                    <span class="text-borderLight">|</span>
+                    <span class="text-inkLight font-medium">总结自己、剖析自己、超越自己</span>
                 </div>
-                <div class="bg-canvas p-2 rounded-full border border-borderLight text-inkLight group-hover:text-accent group-hover:bg-white group-hover:shadow-soft transition-all duration-300">
-                    <svg id="vision-icon" class="w-5 h-5 transition-transform duration-500 ease-spring" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                <div class="flex items-center gap-2" onclick="event.stopPropagation()">
+                    <button id="open-reports-btn" type="button" class="relative inline-flex items-center gap-1.5 bg-[#FAF9F5] hover:bg-white px-2.5 py-1 rounded-lg border border-borderLight text-[10px] font-bold text-inkLight hover:text-ink transition-all active:scale-95 shadow-sm" title="查看 AI 自动生成的周报与月报">
+                        <span>📑 周期复盘</span>
+                        <span id="ai-report-unread-dot" class="hidden w-2 h-2 rounded-full bg-[#E29578] animate-pulse"></span>
+                    </button>
+                    <button type="button" onclick="toggleVision(event)" class="bg-canvas p-1.5 rounded-full border border-borderLight text-inkLight group-hover:text-accent group-hover:bg-white group-hover:shadow-soft transition-all duration-300" title="展开/收起人生北极星与观自己">
+                        <svg id="vision-icon" class="w-4 h-4 transition-transform duration-500 ease-spring" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
                 </div>
+            </div>
+
+            <!-- 主视觉双栏：左 AI 每日文案 + 右 AI 当下微建议 -->
+            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                <div class="lg:col-span-7 pr-1">
+                    <h1 id="ai-daily-quote" class="text-lg md:text-xl font-bold text-ink leading-snug tracking-tight mb-1.5">“创造极致的视觉体验，掌控自己的人生节奏。”</h1>
+                    <p id="ai-daily-quote-meta" class="text-[10.5px] text-inkLight/80 font-serif italic">每日头版文案 · 每天 07:00 自动焕新</p>
+                </div>
+                <div class="lg:col-span-5" onclick="event.stopPropagation()">
+                    <div class="bg-[#FAF9F5]/85 border border-borderLight/90 rounded-xl p-3.5 shadow-sm">
+                        <div class="flex items-center justify-between gap-2 mb-1.5">
+                            <span class="text-[10px] font-bold text-[#839788] flex items-center gap-1">
+                                <span>✦</span> 当下微建议
+                            </span>
+                            <button id="ai-refresh-daily-btn" type="button" class="text-[10px] text-inkLight hover:text-accent transition-colors flex items-center gap-1 active:scale-90" title="立即刷新今日文案与微建议">
+                                <svg id="ai-refresh-icon" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                <span>刷新</span>
+                            </button>
+                        </div>
+                        <p id="ai-daily-tip" class="text-[11.5px] text-ink/90 leading-relaxed">等待每日定时同步，或点击右上角「刷新」立即生成今天的专属文案与行动微建议。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 未读周报/月报提醒胶囊 -->
+            <div id="ai-unread-banner" class="hidden relative z-10 mt-3.5 pt-3 border-t border-borderLight/60 flex items-center justify-between gap-2" onclick="event.stopPropagation()">
+                <button id="ai-unread-banner-btn" type="button" class="inline-flex items-center gap-2 bg-[#E29578]/10 hover:bg-[#E29578]/20 border border-[#E29578]/30 text-[#C06C4E] px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all active:scale-95">
+                    <span class="w-2 h-2 rounded-full bg-[#E29578] animate-pulse"></span>
+                    <span id="ai-unread-banner-text">✦ 你有新的周期复盘已生成，点击阅读</span>
+                </button>
             </div>
             
             <div id="vision-details" class="vision-content relative z-10 cursor-default" onclick="event.stopPropagation()">
@@ -558,7 +618,10 @@
                         </p>
                         <h2 class="text-xl font-bold text-ink">财富与资产金库</h2>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button id="ai-wealth-diagnose-btn" type="button" class="flex items-center gap-1.5 text-[11px] font-bold text-accent bg-accent/10 hover:bg-accent hover:text-white px-3 py-1.5 rounded-lg border border-accent/30 transition-all active:scale-95" title="仅发送当前筛选的汇总分类给 AI 进行诊断">
+                            <span>✦ AI 账单诊断</span>
+                        </button>
                         <button id="toggle-wealth-visibility" type="button" class="flex items-center gap-1.5 text-[11px] font-bold text-inkLight hover:text-ink bg-[#F8F6F0] hover:bg-white px-3 py-1.5 rounded-lg border border-borderLight transition-all active:scale-95" title="隐藏/显示金额">
                             <svg id="eye-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -705,6 +768,93 @@
             </div>
         </div> <!-- 结束 #view-vault -->
 
+    </div>
+
+    <!-- AI 周期复盘报告归档弹窗 (周报 / 月报) -->
+    <div id="ai-report-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-[#4A443B]/25 backdrop-blur-sm p-4">
+        <div class="oil-panel rounded-2xl w-full max-w-2xl max-h-[85vh] bg-[#FDFCF9]/95 shadow-2xl border border-borderLight flex flex-col overflow-hidden">
+            <!-- 顶栏 -->
+            <div class="px-5 py-4 border-b border-borderLight/80 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
+                <div>
+                    <h3 class="text-sm font-bold text-ink flex items-center gap-1.5">
+                        <span>📑</span> 周期复盘归档
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-accent/15 text-accent">云端自动留存</span>
+                    </h3>
+                    <p class="text-[10px] text-inkLight mt-0.5">每周日 22:00 自动生成周报 · 每月 1 日 08:00 自动生成月报</p>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button id="ai-gen-weekly-btn" type="button" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-[#F8F6F0] hover:bg-white border border-borderLight text-ink hover:border-accent transition-all active:scale-95">⚡ 立即生成周报</button>
+                    <button id="ai-gen-monthly-btn" type="button" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-[#F8F6F0] hover:bg-white border border-borderLight text-ink hover:border-accent transition-all active:scale-95">🌙 立即生成月报</button>
+                    <button id="ai-report-close-btn" type="button" class="p-1.5 text-inkLight hover:text-ink hover:bg-[#F4F1EA] rounded-lg transition-colors active:scale-90">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 筛选标签 -->
+            <div class="px-5 py-2.5 border-b border-borderLight/60 bg-[#FAF9F5]/80 flex items-center justify-between flex-shrink-0">
+                <div class="flex bg-borderLight/40 p-0.5 rounded-lg border border-borderLight/50">
+                    <button type="button" data-report-filter="all" class="report-filter-btn px-2.5 py-1 text-[10px] font-bold rounded-md bg-white shadow-sm text-ink transition-all">全部</button>
+                    <button type="button" data-report-filter="weekly" class="report-filter-btn px-2.5 py-1 text-[10px] font-bold rounded-md text-inkLight hover:text-ink transition-all">周报</button>
+                    <button type="button" data-report-filter="monthly" class="report-filter-btn px-2.5 py-1 text-[10px] font-bold rounded-md text-inkLight hover:text-ink transition-all">月报</button>
+                </div>
+                <span id="ai-report-status-msg" class="text-[10px] text-accent font-bold"></span>
+            </div>
+
+            <!-- 报告列表内容区 -->
+            <div id="ai-report-list" class="flex-1 overflow-y-auto p-5 space-y-4">
+                <p class="text-center text-xs text-inkLight/60 py-10 font-serif italic">暂无已归档的周期复盘，可点击上方按钮立即生成一份体验。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 副脑右侧玻璃抽屉 -->
+    <div id="ai-drawer-overlay" class="fixed inset-0 z-50 hidden bg-[#4A443B]/20 backdrop-blur-[2px] flex justify-end">
+        <div id="ai-drawer-panel" class="w-full max-w-md h-full bg-[#FDFCF9]/95 backdrop-blur-xl border-l border-borderLight shadow-2xl flex flex-col">
+            <!-- 抽屉顶栏 -->
+            <div class="px-5 py-4 border-b border-borderLight/80 flex items-center justify-between flex-shrink-0">
+                <div>
+                    <h3 class="text-sm font-bold text-ink flex items-center gap-1.5">
+                        <span class="text-accent">✦</span> AI 副脑
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#839788]/15 text-[#839788]">Gemini 直连</span>
+                    </h3>
+                    <p class="text-[10px] text-inkLight mt-0.5">基于你的日常记录做复盘与建议（默认不读取财富金库）</p>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button id="ai-clear-btn" type="button" class="text-[10px] font-bold text-inkLight hover:text-ink px-2 py-1 rounded-lg hover:bg-[#F4F1EA] transition-colors" title="清空当前对话">清空</button>
+                    <button id="ai-close-btn" type="button" class="p-1.5 text-inkLight hover:text-ink hover:bg-[#F4F1EA] rounded-lg transition-colors active:scale-90" title="关闭">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 快捷一键指令栏 -->
+            <div class="px-5 py-3 border-b border-borderLight/60 bg-[#FAF9F5]/80 flex-shrink-0">
+                <p class="text-[9.5px] font-bold text-inkLight/70 uppercase tracking-wider mb-2">一键洞察指令</p>
+                <div class="flex flex-wrap gap-1.5">
+                    <button type="button" data-ai-preset="weekly" class="ai-preset-btn text-[10.5px] font-bold px-2.5 py-1.5 rounded-lg bg-white border border-borderLight text-ink hover:border-accent hover:text-accent transition-all active:scale-95 shadow-sm">📊 本周跨维度复盘</button>
+                    <button type="button" data-ai-preset="monthly" class="ai-preset-btn text-[10.5px] font-bold px-2.5 py-1.5 rounded-lg bg-white border border-borderLight text-ink hover:border-accent hover:text-accent transition-all active:scale-95 shadow-sm">🌙 本月节奏总结</button>
+                    <button type="button" data-ai-preset="vision" class="ai-preset-btn text-[10.5px] font-bold px-2.5 py-1.5 rounded-lg bg-white border border-borderLight text-ink hover:border-accent hover:text-accent transition-all active:scale-95 shadow-sm">🧭 对照30岁愿景给建议</button>
+                    <button type="button" data-ai-preset="today" class="ai-preset-btn text-[10.5px] font-bold px-2.5 py-1.5 rounded-lg bg-white border border-borderLight text-ink hover:border-accent hover:text-accent transition-all active:scale-95 shadow-sm">⚡ 状态与行动建议</button>
+                </div>
+            </div>
+
+            <!-- 对话与报告输出区 -->
+            <div id="ai-messages" class="flex-1 overflow-y-auto px-5 py-4 space-y-3.5">
+                <div class="p-3.5 rounded-xl bg-[#FAF9F5] border border-borderLight text-[11.5px] text-inkLight leading-relaxed">
+                    <p class="font-bold text-ink mb-1">你好，zari ✦</p>
+                    <p>点一下上方的快捷指令，我会自动汇总你最近的运动、习惯、里程碑与拾光记录，为你生成复盘和建议；也可以在下方直接向我提问。</p>
+                </div>
+            </div>
+
+            <!-- 底部自由提问输入框 -->
+            <form id="ai-chat-form" class="p-4 border-t border-borderLight/80 bg-[#FDFCF9] flex-shrink-0">
+                <div class="flex gap-2 items-end">
+                    <textarea id="ai-chat-input" rows="2" placeholder="基于我的记录提问，例如：最近运动和精力状态有什么规律？" class="flex-1 input-paper rounded-xl px-3.5 py-2.5 text-xs text-ink focus:outline-none resize-none placeholder-inkLight/50 leading-relaxed"></textarea>
+                    <button id="ai-send-btn" type="submit" class="bg-ink text-canvas hover:bg-inkLight disabled:opacity-50 px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-sm whitespace-nowrap h-[42px]">发送</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- 口令验证弹窗 (0726) -->
@@ -1097,7 +1247,8 @@
                             <span class="text-[9px] font-bold bg-[#EAE5D9] text-inkLight px-1.5 py-0.5 rounded">待派发</span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="flex items-center gap-1.5 opacity-90 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2">
+                        <button onclick="window.aiAnalyzeCapsule('${capsule.id}')" class="text-[11px] bg-accent/12 border border-accent/35 text-accent hover:bg-accent hover:text-white px-2 py-1.5 rounded-lg transition-colors font-bold active:scale-95" title="让 AI 帮你判断归类与拆解步骤">✦ AI拆解</button>
                         <button onclick="window.dispatchCapsule('${capsule.id}')" class="text-[11px] bg-ink border border-ink text-white hover:bg-inkLight px-2 py-1.5 rounded-lg transition-colors font-bold shadow-sm active:scale-95">派发流转</button>
                         <button onclick="window.deleteCapsule('${capsule.id}')" class="text-inkLight hover:text-red-400 p-1 transition-colors active:scale-90"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                     </div>
@@ -2279,6 +2430,538 @@
                 verifyPasscode();
             }
         });
+
+        // ==========================================
+        // 模块 6：AI 副脑 (Supabase Edge Function -> Gemini)
+        // ==========================================
+        const AI_ENDPOINT = `${SUPABASE_URL}/functions/v1/ai-assistant`;
+        const aiOverlay = document.getElementById('ai-drawer-overlay');
+        const aiMessagesEl = document.getElementById('ai-messages');
+        const aiChatForm = document.getElementById('ai-chat-form');
+        const aiChatInput = document.getElementById('ai-chat-input');
+        const aiSendBtn = document.getElementById('ai-send-btn');
+        let isAiLoading = false;
+
+        function openAiDrawer() {
+            aiOverlay.classList.remove('hidden');
+            requestAnimationFrame(() => aiOverlay.classList.add('open'));
+        }
+
+        function closeAiDrawer() {
+            aiOverlay.classList.remove('open');
+            setTimeout(() => aiOverlay.classList.add('hidden'), 320);
+        }
+
+        document.getElementById('open-ai-drawer-btn').addEventListener('click', openAiDrawer);
+        document.getElementById('ai-close-btn').addEventListener('click', closeAiDrawer);
+        aiOverlay.addEventListener('click', (e) => {
+            if (e.target === aiOverlay) closeAiDrawer();
+        });
+        document.getElementById('ai-clear-btn').addEventListener('click', () => {
+            aiMessagesEl.innerHTML = `
+                <div class="p-3.5 rounded-xl bg-[#FAF9F5] border border-borderLight text-[11.5px] text-inkLight leading-relaxed">
+                    <p class="font-bold text-ink mb-1">对话已清空 ✦</p>
+                    <p>随时点击上方快捷指令，或在下方输入你想探讨的问题。</p>
+                </div>`;
+        });
+
+        // 轻量 Markdown 转 HTML（安全转义后再解析加粗、标题、列表）
+        function renderAiMarkdown(mdText) {
+            const safe = escapeHTML(mdText || '');
+            const lines = safe.split(/\r?\n/);
+            let htmlOut = '';
+            let inUl = false;
+            let inOl = false;
+
+            const formatInline = (str) => str
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 rounded bg-[#EAE5D9]/70 text-[10.5px]">$1</code>');
+
+            const closeLists = () => {
+                if (inUl) { htmlOut += '</ul>'; inUl = false; }
+                if (inOl) { htmlOut += '</ol>'; inOl = false; }
+            };
+
+            lines.forEach(rawLine => {
+                const line = rawLine.trim();
+                if (!line) {
+                    closeLists();
+                    return;
+                }
+                if (/^###\s+/.test(line)) {
+                    closeLists();
+                    htmlOut += `<h4 class="text-[12px]">${formatInline(line.replace(/^###\s+/, ''))}</h4>`;
+                } else if (/^##\s+/.test(line)) {
+                    closeLists();
+                    htmlOut += `<h3 class="text-[12.5px]">${formatInline(line.replace(/^##\s+/, ''))}</h3>`;
+                } else if (/^[-*]\s+/.test(line)) {
+                    if (inOl) { htmlOut += '</ol>'; inOl = false; }
+                    if (!inUl) { htmlOut += '<ul>'; inUl = true; }
+                    htmlOut += `<li>${formatInline(line.replace(/^[-*]\s+/, ''))}</li>`;
+                } else if (/^\d+\.\s+/.test(line)) {
+                    if (inUl) { htmlOut += '</ul>'; inUl = false; }
+                    if (!inOl) { htmlOut += '<ol>'; inOl = true; }
+                    htmlOut += `<li>${formatInline(line.replace(/^\d+\.\s+/, ''))}</li>`;
+                } else {
+                    closeLists();
+                    htmlOut += `<p>${formatInline(line)}</p>`;
+                }
+            });
+            closeLists();
+            return htmlOut || `<p>${safe}</p>`;
+        }
+
+        function appendAiMessage(role, content, badgeText = '') {
+            const wrap = document.createElement('div');
+            if (role === 'user') {
+                wrap.className = 'flex justify-end';
+                wrap.innerHTML = `
+                    <div class="max-w-[85%] px-3.5 py-2.5 rounded-2xl rounded-tr-sm bg-ink text-canvas text-[11.5px] leading-relaxed shadow-sm">
+                        ${badgeText ? `<div class="text-[9px] text-accent font-bold mb-1">${escapeHTML(badgeText)}</div>` : ''}
+                        <div class="whitespace-pre-wrap break-words">${escapeHTML(content)}</div>
+                    </div>`;
+            } else {
+                wrap.className = 'flex justify-start';
+                wrap.innerHTML = `
+                    <div class="w-full p-3.5 rounded-2xl rounded-tl-sm bg-[#FAF9F5] border border-borderLight text-[11.5px] text-ink leading-relaxed shadow-sm ai-md">
+                        ${badgeText ? `<div class="text-[9.5px] text-[#839788] font-bold mb-1.5 flex items-center gap-1"><span>✦</span>${escapeHTML(badgeText)}</div>` : ''}
+                        <div class="ai-content">${role === 'loading' ? '<span class="text-inkLight animate-pulse">正在思考并整理洞察...</span>' : renderAiMarkdown(content)}</div>
+                    </div>`;
+            }
+            aiMessagesEl.appendChild(wrap);
+            aiMessagesEl.scrollTop = aiMessagesEl.scrollHeight;
+            return wrap;
+        }
+
+        // 汇总日常空间数据（严格不包含财富金库数据）
+        function buildDailyContextText(days = 7) {
+            const cutoffMs = Date.now() - days * 24 * 60 * 60 * 1000;
+            const cutoffKey = toDateKey(cutoffMs);
+
+            const recentHealth = currentHealth.filter(h => getHealthDateKey(h) >= cutoffKey).slice(0, 20);
+            const recentHabits = currentHabits.filter(h => (h.createdAt || 0) >= cutoffMs).slice(0, 25);
+            const recentExp = currentExp.filter(e => (e.createdAt || 0) >= cutoffMs).slice(0, 15);
+            const recentWorld = currentWorld.filter(w => (w.createdAt || 0) >= cutoffMs).slice(0, 10);
+            const recentSelf = currentSelf.filter(s => (s.createdAt || 0) >= cutoffMs).slice(0, 10);
+            const activeSkills = currentSkills.filter(s => s.status !== 'done').slice(0, 15);
+            const doneSkills = currentSkills.filter(s => s.status === 'done' && (s.completedAt || s.createdAt || 0) >= cutoffMs).slice(0, 15);
+            const inboxItems = currentCapsules.slice(0, 10);
+
+            return [
+                `【北极星愿景】`,
+                `- 30岁的zari：${currentVisions.vision30}`,
+                `- 想成为的人：${currentVisions.visionPerson}`,
+                ``,
+                `【最近 ${days} 天运动与能量 (${recentHealth.length}条)】`,
+                recentHealth.length ? recentHealth.map(h => `- ${getHealthDateKey(h)} | ${h.activity} ${h.duration} | 状态：${h.state}`).join('\n') : '- 暂无记录',
+                ``,
+                `【最近 ${days} 天习惯打卡 (${recentHabits.length}条)】`,
+                recentHabits.length ? recentHabits.map(h => `- ${toDateKey(h.createdAt)} | ${h.name}：${h.content}`).join('\n') : '- 暂无记录',
+                ``,
+                `【当前进行中/抽屉里程碑 (${activeSkills.length}条)】`,
+                activeSkills.length ? activeSkills.map(s => `- [${s.status === 'wip' ? '专注' : '抽屉'}] ${s.text}${s.dueDate ? ' (计划:' + s.dueDate + ')' : ''}`).join('\n') : '- 暂无',
+                ``,
+                `【最近 ${days} 天已完成里程碑 (${doneSkills.length}条)】`,
+                doneSkills.length ? doneSkills.map(s => `- ${s.text}`).join('\n') : '- 暂无',
+                ``,
+                `【最近 ${days} 天生活拾光 (${recentExp.length}条)】`,
+                recentExp.length ? recentExp.map(e => `- ${toDateKey(e.createdAt)} [${e.tag}] ${e.text}`).join('\n') : '- 暂无',
+                ``,
+                `【最近思考（观世界 / 观自己）】`,
+                ...(recentWorld.map(w => `- [观世界] ${w.text}`)),
+                ...(recentSelf.map(s => `- [观自己] ${s.text}`)),
+                ...(recentWorld.length + recentSelf.length === 0 ? ['- 暂无'] : []),
+                ``,
+                `【闪念胶囊待分拣 (${inboxItems.length}条)】`,
+                inboxItems.length ? inboxItems.map(c => `- ${c.text}`).join('\n') : '- 无'
+            ].join('\n');
+        }
+
+        async function callAiAssistant({ displayUserMsg, userBadge = '', prompt, systemInstruction, replyBadge = 'AI 副脑' }) {
+            if (isAiLoading) return;
+            isAiLoading = true;
+            aiSendBtn.disabled = true;
+
+            openAiDrawer();
+            appendAiMessage('user', displayUserMsg, userBadge);
+            const loadingNode = appendAiMessage('loading', '', replyBadge);
+
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'x-ai-passcode': VAULT_PASSCODE
+                };
+                if (SUPABASE_KEY.startsWith('eyJ')) {
+                    headers['Authorization'] = `Bearer ${SUPABASE_KEY}`;
+                }
+
+                const res = await fetch(AI_ENDPOINT, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ prompt, systemInstruction })
+                });
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    throw new Error(data.error || data.message || `HTTP ${res.status}`);
+                }
+
+                const contentEl = loadingNode.querySelector('.ai-content');
+                contentEl.innerHTML = renderAiMarkdown(data.reply || '暂无回复');
+            } catch (err) {
+                console.error('AI call error:', err);
+                const contentEl = loadingNode.querySelector('.ai-content');
+                contentEl.innerHTML = `<p class="text-[#E29578] font-bold">调用失败：${escapeHTML(err.message)}</p><p class="text-[10.5px] text-inkLight mt-1">若提示 401，请检查 Supabase Edge Function 详情页是否开启了 Enforce JWT Verification（将其关闭即可）或核对 Secrets 中的 GEMINI_API_KEY 与 AI_PASSCODE。</p>`;
+            } finally {
+                isAiLoading = false;
+                aiSendBtn.disabled = false;
+                aiMessagesEl.scrollTop = aiMessagesEl.scrollHeight;
+            }
+        }
+
+        const DEFAULT_AI_SYSTEM = "你是 zari 的个人数字副脑，风格温暖、清醒、有洞察力，说话直接且具象，不堆砌鸡汤。请基于提供的真实记录给出有条理的总结与可落地的微调建议，使用简洁的中文 Markdown 排版。";
+
+        // 快捷指令按钮事件
+        document.querySelectorAll('.ai-preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const type = btn.getAttribute('data-ai-preset');
+                if (type === 'weekly') {
+                    const ctx = buildDailyContextText(7);
+                    callAiAssistant({
+                        displayUserMsg: '帮我做一次本周跨维度复盘，并给出下周微调建议。',
+                        prompt: `以下是 zari 最近 7 天的真实生活与成长记录：
+
+${ctx}
+
+请帮我做一次结构化周报复盘：
+1. 本周亮点与节奏总结（运动、精力状态、习惯与进展）
+2. 值得注意的信号或失衡点
+3. 下周最值得优先做的 3 件具体微调建议。`,
+                        systemInstruction: DEFAULT_AI_SYSTEM,
+                        replyBadge: '本周跨维度复盘'
+                    });
+                } else if (type === 'monthly') {
+                    const ctx = buildDailyContextText(30);
+                    callAiAssistant({
+                        displayUserMsg: '帮我总结最近一个月的整体生活节奏与成长轨迹。',
+                        prompt: `以下是 zari 最近 30 天的记录：
+
+${ctx}
+
+请帮我做一次月度总结：
+1. 身体能量与运动规律分析
+2. 长期习惯与里程碑推进情况
+3. 内观与生活拾光的关键词提炼
+4. 下个月的重点聚焦建议。`,
+                        systemInstruction: DEFAULT_AI_SYSTEM,
+                        replyBadge: '本月节奏总结'
+                    });
+                } else if (type === 'vision') {
+                    const ctx = buildDailyContextText(14);
+                    callAiAssistant({
+                        displayUserMsg: '对照我的 30 岁愿景，看看现在的行动方向有没有跑偏？',
+                        prompt: `以下是 zari 的北极星愿景和最近 14 天的行动记录：
+
+${ctx}
+
+请对照「30岁的zari」和「想成为的人」：
+1. 指出目前哪些行动正在拉近与愿景的距离
+2. 指出可能被忽略的关键短板
+3. 给出 2-3 个可以立刻放进“里程碑”的具体行动项。`,
+                        systemInstruction: DEFAULT_AI_SYSTEM,
+                        replyBadge: '愿景对齐诊断'
+                    });
+                } else if (type === 'today') {
+                    const ctx = buildDailyContextText(5);
+                    callAiAssistant({
+                        displayUserMsg: '结合我最近几天的精力状态和待办，给我今天的行动建议。',
+                        prompt: `以下是 zari 最近 5 天的记录与当前进行中目标：
+
+${ctx}
+
+请结合她最近的精力反馈和运动情况，给出今天的节奏建议（今天适合攻坚什么、是否需要回血休息、优先推进哪一件小事）。`,
+                        systemInstruction: DEFAULT_AI_SYSTEM,
+                        replyBadge: '今日节奏建议'
+                    });
+                }
+            });
+        });
+
+        // 自由对话提交
+        aiChatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const q = aiChatInput.value.trim();
+            if (!q || isAiLoading) return;
+            aiChatInput.value = '';
+            const ctx = buildDailyContextText(14);
+            callAiAssistant({
+                displayUserMsg: q,
+                prompt: `以下是 zari 最近 14 天的日常记录作为背景参考：
+
+${ctx}
+
+用户当前提问：${q}`,
+                systemInstruction: DEFAULT_AI_SYSTEM,
+                replyBadge: 'AI 副脑回复'
+            });
+        });
+
+        // 闪念胶囊：AI 智能归类与拆解
+        window.aiAnalyzeCapsule = (id) => {
+            const capsule = currentCapsules.find(c => c.id === id);
+            if (!capsule) return;
+            callAiAssistant({
+                displayUserMsg: `帮我分析并拆解这条闪念：「${capsule.text}」`,
+                userBadge: '闪念胶囊 · 智能拆解',
+                prompt: `zari 在闪念胶囊里记下了一条想法：
+“${capsule.text}”
+
+她的系统有 5 个归档维度：
+1. 🎯 左脑·里程碑（有明确终点的目标任务）
+2. 🌱 左脑·无尽习惯（需要长期坚持的日常动作）
+3. 💡 右脑·灵感星空（视觉创意、设计点子）
+4. 🌍 观世界（对外部事物/行业/趋势的洞察）
+5. 🪞 观自己（自我剖析、情绪与成长反思）
+
+请帮她：
+1. 推荐最适合派发到哪一个维度，并简述理由；
+2. 如果这是一项可执行的想法，帮她拆解成 2-3 个具体、可立刻落地的下一步小行动。`,
+                systemInstruction: DEFAULT_AI_SYSTEM,
+                replyBadge: '闪念归类与拆解建议'
+            });
+        };
+
+        // 财富金库：手动触发 AI 账单诊断（仅发送汇总统计，不发送无关隐私）
+        document.getElementById('ai-wealth-diagnose-btn').addEventListener('click', () => {
+            const filtered = currentWealth.filter(matchesWealthFilters);
+            const timeLabel = wealthFilterTime.options[wealthFilterTime.selectedIndex].text.replace('📅 ', '');
+            const catLabel = wealthFilterCategory.options[wealthFilterCategory.selectedIndex].text.replace('🏷️ ', '');
+
+            let totalIn = 0, totalOut = 0;
+            const outByCat = {};
+            const inByCat = {};
+            filtered.forEach(t => {
+                const amt = parseFloat(t.amount) || 0;
+                const cat = t.category || '其他';
+                if (t.type === 'income') {
+                    totalIn += amt;
+                    inByCat[cat] = (inByCat[cat] || 0) + amt;
+                } else {
+                    totalOut += amt;
+                    outByCat[cat] = (outByCat[cat] || 0) + amt;
+                }
+            });
+
+            const summaryText = [
+                `统计范围：${timeLabel} / ${catLabel}（共 ${filtered.length} 笔）`,
+                `总存入：¥${totalIn.toFixed(2)}`,
+                `总支出：¥${totalOut.toFixed(2)}`,
+                `净结余：¥${(totalIn - totalOut).toFixed(2)}`,
+                `支出分类明细：${Object.entries(outByCat).map(([k, v]) => `${k} ¥${v.toFixed(2)}`).join('，') || '无'}`,
+                `进账分类明细：${Object.entries(inByCat).map(([k, v]) => `${k} ¥${v.toFixed(2)}`).join('，') || '无'}`
+            ].join('\n');
+
+            callAiAssistant({
+                displayUserMsg: `帮我诊断【${timeLabel}】的收支结构与储蓄节奏。`,
+                userBadge: '🔒 仅发送当前筛选汇总',
+                prompt: `以下是 zari 财富金库当前的分类汇总数据：
+
+${summaryText}
+
+请以理性、克制、实用的财务顾问视角：
+1. 点评当前的收支结构与储蓄率；
+2. 指出占比最高或值得留意的消费项；
+3. 给出 2 条具体可执行的现金流优化建议。`,
+                systemInstruction: "你是 zari 的私人财务分析助手，语气理性、温和、具象，直接基于数据给洞察和建议。",
+                replyBadge: '财富金库 · 账单诊断'
+            });
+        });
+
+        // ==========================================
+        // 模块 7：AI 每日头版文案 & 定时周期复盘归档
+        // ==========================================
+        const aiDailyDocRef = doc(db, 'ai_daily', 'current');
+        const aiReportsCol = collection(db, 'ai_reports');
+        let currentAiReports = [];
+        let currentReportFilter = 'all';
+
+        const aiReportModal = document.getElementById('ai-report-modal');
+        const aiReportListEl = document.getElementById('ai-report-list');
+        const aiReportStatusMsg = document.getElementById('ai-report-status-msg');
+        const aiUnreadDot = document.getElementById('ai-report-unread-dot');
+        const aiUnreadBanner = document.getElementById('ai-unread-banner');
+        const aiUnreadBannerText = document.getElementById('ai-unread-banner-text');
+
+        // 监听每日头版文案与当下微建议
+        onSnapshot(aiDailyDocRef, (docSnap) => {
+            if (!docSnap.exists()) return;
+            const d = docSnap.data();
+            if (d.quote) {
+                document.getElementById('ai-daily-quote').textContent = d.quote;
+            }
+            if (d.quoteTag || d.dateKey) {
+                const tagStr = d.quoteTag ? ` · ${d.quoteTag}` : '';
+                const dateStr = d.dateKey ? formatDateKeyCN(d.dateKey) : '';
+                document.getElementById('ai-daily-quote-meta').textContent = `${dateStr}${tagStr}`;
+            }
+            if (d.tip) {
+                document.getElementById('ai-daily-tip').textContent = d.tip;
+            }
+        });
+
+        // 监听周报与月报归档
+        onSnapshot(aiReportsCol, (snapshot) => {
+            currentAiReports = [];
+            snapshot.forEach(docItem => currentAiReports.push({ id: docItem.id, ...docItem.data() }));
+            currentAiReports.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            renderAiReports();
+        });
+
+        function renderAiReports() {
+            const unreadReports = currentAiReports.filter(r => r.read === false);
+            if (unreadReports.length > 0) {
+                aiUnreadDot.classList.remove('hidden');
+                aiUnreadBanner.classList.remove('hidden');
+                const latest = unreadReports[0];
+                const typeText = latest.type === 'monthly' ? '月度复盘' : '本周复盘';
+                aiUnreadBannerText.textContent = `✦ 你的【${latest.title || typeText}】已自动生成，点击阅读`;
+            } else {
+                aiUnreadDot.classList.add('hidden');
+                aiUnreadBanner.classList.add('hidden');
+            }
+
+            const filtered = currentAiReports.filter(r => currentReportFilter === 'all' || r.type === currentReportFilter);
+            aiReportListEl.innerHTML = '';
+            if (filtered.length === 0) {
+                aiReportListEl.innerHTML = '<p class="text-center text-xs text-inkLight/60 py-10 font-serif italic">暂无该分类的复盘记录，可点击上方按钮立即生成一份体验。</p>';
+                return;
+            }
+
+            filtered.forEach(r => {
+                const isMonthly = r.type === 'monthly';
+                const badgeClass = isMonthly ? 'bg-accent/15 text-accent' : 'bg-[#839788]/15 text-[#839788]';
+                const badgeLabel = isMonthly ? '🌙 月报' : '📊 周报';
+                const d = r.createdAt ? new Date(r.createdAt) : new Date();
+                const dateStr = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
+
+                const card = document.createElement('div');
+                card.className = 'p-4 rounded-xl bg-[#FAF9F5] border border-borderLight space-y-2.5';
+                card.innerHTML = `
+                    <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-borderLight/60">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${badgeClass}">${badgeLabel}</span>
+                            <h4 class="text-xs font-bold text-ink">${escapeHTML(r.title || '周期复盘')}</h4>
+                            ${r.read === false ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#E29578]/15 text-[#E29578]">未读</span>' : ''}
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-inkLight">${dateStr}</span>
+                            ${r.read === false ? `<button type="button" onclick="window.markReportRead('${r.id}')" class="text-[10px] font-bold text-[#839788] hover:bg-[#839788] hover:text-white px-2 py-0.5 rounded border border-[#839788]/30 transition-all active:scale-95">标记已阅</button>` : ''}
+                            <button type="button" onclick="window.deleteAiReport('${r.id}')" class="text-inkLight hover:text-red-400 p-0.5 transition-colors" title="删除此报告">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-[11.5px] text-ink leading-relaxed ai-md">${renderAiMarkdown(r.content || '')}</div>
+                `;
+                aiReportListEl.appendChild(card);
+            });
+        }
+
+        window.markReportRead = async (id) => {
+            await setDoc(doc(db, 'ai_reports', id), { read: true }, { merge: true });
+        };
+        window.deleteAiReport = async (id) => {
+            if (confirm('确定删除这份归档复盘吗？')) {
+                await deleteDoc(doc(db, 'ai_reports', id));
+            }
+        };
+
+        function openReportModal() {
+            aiReportModal.classList.remove('hidden');
+            aiReportModal.classList.add('flex');
+            renderAiReports();
+        }
+        function closeReportModal() {
+            aiReportModal.classList.add('hidden');
+            aiReportModal.classList.remove('flex');
+        }
+
+        document.getElementById('open-reports-btn').addEventListener('click', openReportModal);
+        document.getElementById('ai-unread-banner-btn').addEventListener('click', openReportModal);
+        document.getElementById('ai-report-close-btn').addEventListener('click', closeReportModal);
+        aiReportModal.addEventListener('click', (e) => {
+            if (e.target === aiReportModal) closeReportModal();
+        });
+
+        document.querySelectorAll('.report-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentReportFilter = btn.getAttribute('data-report-filter');
+                document.querySelectorAll('.report-filter-btn').forEach(b => {
+                    b.className = 'report-filter-btn px-2.5 py-1 text-[10px] font-bold rounded-md text-inkLight hover:text-ink transition-all';
+                });
+                btn.className = 'report-filter-btn px-2.5 py-1 text-[10px] font-bold rounded-md bg-white shadow-sm text-ink transition-all';
+                renderAiReports();
+            });
+        });
+
+        // 手动触发云端生成（复用与定时任务完全相同的服务端逻辑）
+        async function triggerScheduledAiMode(mode) {
+            const headers = {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_KEY,
+                'x-ai-passcode': VAULT_PASSCODE
+            };
+            if (SUPABASE_KEY.startsWith('eyJ')) {
+                headers['Authorization'] = `Bearer ${SUPABASE_KEY}`;
+            }
+            const res = await fetch(AI_ENDPOINT, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ mode })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || data.message || `HTTP ${res.status}`);
+            lastCloudSnapshot = null;
+            await syncAllFromCloud(true);
+            return data;
+        }
+
+        const refreshDailyBtn = document.getElementById('ai-refresh-daily-btn');
+        const refreshDailyIcon = document.getElementById('ai-refresh-icon');
+        refreshDailyBtn.addEventListener('click', async () => {
+            if (refreshDailyBtn.disabled) return;
+            refreshDailyBtn.disabled = true;
+            refreshDailyIcon.classList.add('animate-spin');
+            try {
+                await triggerScheduledAiMode('daily');
+            } catch (err) {
+                alert('刷新今日文案与建议失败：' + err.message);
+            } finally {
+                refreshDailyBtn.disabled = false;
+                refreshDailyIcon.classList.remove('animate-spin');
+            }
+        });
+
+        const genWeeklyBtn = document.getElementById('ai-gen-weekly-btn');
+        const genMonthlyBtn = document.getElementById('ai-gen-monthly-btn');
+        async function handleManualReportGen(mode, btn, label) {
+            if (btn.disabled) return;
+            btn.disabled = true;
+            aiReportStatusMsg.textContent = `正在生成${label}...`;
+            try {
+                await triggerScheduledAiMode(mode);
+                aiReportStatusMsg.textContent = `${label}已生成并归档 ✓`;
+                setTimeout(() => { aiReportStatusMsg.textContent = ''; }, 3000);
+            } catch (err) {
+                aiReportStatusMsg.textContent = '';
+                alert(`生成${label}失败：` + err.message);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        genWeeklyBtn.addEventListener('click', () => handleManualReportGen('weekly', genWeeklyBtn, '本周复盘'));
+        genMonthlyBtn.addEventListener('click', () => handleManualReportGen('monthly', genMonthlyBtn, '本月总结'));
 
         // 初始渲染一次日历骨架并拉取云端全部数据
         renderCalendar();
